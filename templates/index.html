@@ -90,24 +90,24 @@ body {
 }
 
 
-/* 壘包佈局調整：Diamond Field 結構 - 放大 */
+/* 壘包佈局調整：Diamond Field 結構 - 確保不突出 */
 .bases-display {
     position: absolute;
-    right: 15px;
+    right: 5px;
     top: 50%;
     transform: translateY(-50%);
-    width: 120px; /* 放大 */
-    height: 120px; /* 放大 */
+    width: 100px;
+    height: 100px;
     display: block;
 }
 
 .base-diamond {
     position: absolute;
-    width: 30px; /* 放大 */
-    height: 30px; /* 放大 */
+    width: 24px;
+    height: 24px;
     background: rgba(255, 255, 255, 0.3);
     transform: rotate(45deg); 
-    border-radius: 5px; /* 稍微圓角 */
+    border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
@@ -116,22 +116,22 @@ body {
     border: 1px solid #ffaa00;
 }
 
-/* 壘包位置定義 (相對於 120x120 的容器) */
+/* 壘包位置定義 (相對於 100x100 的容器，確保不突出) */
 #b1 { /* 一壘 (右側) */
     top: 50%;
-    right: 10px;
+    right: 5px;
     transform: translateY(-50%) rotate(45deg);
 }
 
 #b2 { /* 二壘 (上側) */
-    top: 10px;
+    top: 5px;
     left: 50%;
     transform: translateX(-50%) rotate(45deg);
 }
 
 #b3 { /* 三壘 (左側) */
     top: 50%;
-    left: 10px;
+    left: 5px;
     transform: translateY(-50%) rotate(45deg);
 }
 

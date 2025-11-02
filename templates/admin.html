@@ -4,17 +4,55 @@
 <meta charset="UTF-8">
 <title>控制台</title>
 <style>
-body { font-family: "Noto Sans TC", sans-serif; background: #111; color: #fff; text-align: center; }
-input { margin: 5px; padding: 5px; }
-button { padding: 10px 20px; margin-top: 10px; cursor: pointer; border: 1px solid #fff; }
-.base-button { width: 80px; margin: 5px; }
+html, body { 
+    font-family: "Noto Sans TC", sans-serif; 
+    background: #111; 
+    color: #fff; 
+    margin: 0; 
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+body { padding: 5px; }
+h1 { margin: 3px 0; font-size: 1.2em; }
+h2 { margin: 3px 0; font-size: 1em; }
+form { 
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    padding: 0;
+    height: calc(100vh - 40px);
+    overflow: hidden;
+}
+input { margin: 2px; padding: 3px 5px; font-size: 0.9em; }
+button { padding: 6px 12px; margin: 2px; cursor: pointer; border: 1px solid #fff; font-size: 0.85em; }
+.base-button { width: 70px; margin: 2px; font-size: 0.85em; }
 .base-active { background-color: #ffcc00; color: #111; font-weight: bold; border-color: #ffaa00; }
 .base-inactive { background-color: #333; color: #fff; }
-.control-group { margin: 15px 0; border: 1px solid #444; padding: 10px; border-radius: 5px; }
-.control-group h3 { margin-top: 0; }
-.counter-btn { width: 40px; margin: 0 5px; background: #555; color: #fff; }
-.current-value { display: inline-block; width: 60px; text-align: center; margin: 0 10px; font-weight: bold; font-size: 1.2em;}
-.clear-btn { background: #cc0000; color: #fff; border: none; padding: 5px 10px; margin-left: 10px; cursor: pointer;}
+.control-group { 
+    margin: 3px 0; 
+    border: 1px solid #444; 
+    padding: 5px; 
+    border-radius: 3px; 
+    font-size: 0.9em;
+}
+.control-group h3 { margin: 2px 0 5px 0; font-size: 0.95em; }
+.control-group label { font-size: 0.85em; display: inline-block; min-width: 70px; }
+.control-group br { margin: 2px 0; }
+.counter-btn { width: 35px; margin: 0 3px; background: #555; color: #fff; padding: 4px; font-size: 0.9em; }
+.current-value { display: inline-block; width: 50px; text-align: center; margin: 0 5px; font-weight: bold; font-size: 1em;}
+.clear-btn { background: #cc0000; color: #fff; border: none; padding: 4px 8px; margin-left: 5px; cursor: pointer; font-size: 0.8em;}
+.control-group-row { margin: 3px 0; }
+.control-group-row label { display: inline-block; min-width: 70px; }
+.team-info-group { grid-column: 1 / -1; }
+.submit-btn { 
+    grid-column: 1 / -1; 
+    background: #00cc00; 
+    color: #fff; 
+    padding: 8px; 
+    margin-top: 5px;
+}
 </style>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 </head>
@@ -22,63 +60,74 @@ button { padding: 10px 20px; margin-top: 10px; cursor: pointer; border: 1px soli
 <h1>計分板控制台</h1>
 
 <form id="control">
-  <h2>隊伍與文字資訊</h2>
-  
-  <div class="control-group">
+  <div class="control-group team-info-group">
     <h3>隊伍設定</h3>
-    <label>客隊文字縮寫:</label> <input name="away_team" placeholder="客隊文字縮寫 (例: G)" value="{{ data.away_team or '' }}"><br>
-    <label>客隊 Logo URL/路徑:</label> <input name="away_logo_url" id="away_logo_url_input" placeholder="選填：圖片 URL 或路徑" value="{{ data.away_logo_url or '' }}" style="width: 250px;"><br>
-    <label>主隊文字縮寫:</label> <input name="home_team" placeholder="主隊文字縮寫 (例: B)" value="{{ data.home_team or '' }}"><br>
-    <label>主隊 Logo URL/路徑:</label> <input name="home_logo_url" id="home_logo_url_input" placeholder="選填：圖片 URL 或路徑" value="{{ data.home_logo_url or '' }}" style="width: 250px;">
+    <div class="control-group-row">
+      <label>客隊文字:</label> <input name="away_team" placeholder="G" value="{{ data.away_team or '' }}" style="width: 80px;">
+      <label>Logo:</label> <input name="away_logo_url" id="away_logo_url_input" placeholder="URL" value="{{ data.away_logo_url or '' }}" style="width: 150px;">
+      <label>主隊文字:</label> <input name="home_team" placeholder="B" value="{{ data.home_team or '' }}" style="width: 80px;">
+      <label>Logo:</label> <input name="home_logo_url" id="home_logo_url_input" placeholder="URL" value="{{ data.home_logo_url or '' }}" style="width: 150px;">
+    </div>
+    <div class="control-group-row">
+      <label>投手:</label> <input name="pitcher" placeholder="投手" value="{{ data.pitcher or '' }}" style="width: 120px;">
+      <label>打者:</label> <input name="batter" placeholder="3 王威晨" value="{{ data.batter or '' }}" style="width: 120px;">
+      <label>打擊率:</label> <input name="avg" placeholder=".292" value="{{ data.avg or '' }}" style="width: 80px;">
+    </div>
   </div>
-  
-  <input name="pitcher" placeholder="投手" value="{{ data.pitcher or '' }}">
-  <input name="batter" placeholder="打者 (例: 3 王威晨)" value="{{ data.batter or '' }}"><br>
-  <input name="avg" placeholder="打擊率 (例: .292)" value="{{ data.avg or '' }}">
   
   <div class="control-group">
     <h3>分數與用球數</h3>
-    <label>客隊分數 (G):</label>
-    <button type="button" class="counter-btn" data-key="away_score" data-op="-">-</button>
-    <span class="current-value" id="away_score_val">{{ data.away_score or 0 }}</span>
-    <button type="button" class="counter-btn" data-key="away_score" data-op="+">+</button><br>
-
-    <label>主隊分數 (B):</label>
-    <button type="button" class="counter-btn" data-key="home_score" data-op="-">-</button>
-    <span class="current-value" id="home_score_val">{{ data.home_score or 0 }}</span>
-    <button type="button" class="counter-btn" data-key="home_score" data-op="+">+</button><br>
-
-    <label>投球數 (NP):</label>
-    <button type="button" class="counter-btn" data-key="np" data-op="-">-</button>
-    <span class="current-value" id="np_val">{{ data.np or 0 }}</span>
-    <button type="button" class="counter-btn" data-key="np" data-op="+">+</button>
+    <div class="control-group-row">
+      <label>客隊分數:</label>
+      <button type="button" class="counter-btn" data-key="away_score" data-op="-">-</button>
+      <span class="current-value" id="away_score_val">{{ data.away_score or 0 }}</span>
+      <button type="button" class="counter-btn" data-key="away_score" data-op="+">+</button>
+    </div>
+    <div class="control-group-row">
+      <label>主隊分數:</label>
+      <button type="button" class="counter-btn" data-key="home_score" data-op="-">-</button>
+      <span class="current-value" id="home_score_val">{{ data.home_score or 0 }}</span>
+      <button type="button" class="counter-btn" data-key="home_score" data-op="+">+</button>
+    </div>
+    <div class="control-group-row">
+      <label>投球數:</label>
+      <button type="button" class="counter-btn" data-key="np" data-op="-">-</button>
+      <span class="current-value" id="np_val">{{ data.np or 0 }}</span>
+      <button type="button" class="counter-btn" data-key="np" data-op="+">+</button>
+    </div>
   </div>
   
   <div class="control-group">
     <h3>局數與好壞出局數</h3>
-    <label>局數：</label>
-    <button type="button" class="counter-btn" id="inning_up">上</button>
-    <button type="button" class="counter-btn" id="inning_down">下</button>
-    <button type="button" class="counter-btn" id="inning_next">下一局</button>
-    <span class="current-value" id="inning_val" style="width: 80px;">{{ data.inning or '1上' }}</span><br>
-
-    <label>壞球 (B):</label>
-    <button type="button" class="counter-btn" data-key="balls" data-op="-">-</button>
-    <span class="current-value" id="balls_val">{{ data.balls or 0 }}</span>
-    <button type="button" class="counter-btn" data-key="balls" data-op="+">+</button> (Max: 4)
-    <button type="button" class="clear-btn" id="clear_balls_btn">清空壞球</button><br>
-
-    <label>好球 (S):</label>
-    <button type="button" class="counter-btn" data-key="strikes" data-op="-">-</button>
-    <span class="current-value" id="strikes_val">{{ data.strikes or 0 }}</span>
-    <button type="button" class="counter-btn" data-key="strikes" data-op="+">+</button> (Max: 3)
-    <button type="button" class="clear-btn" id="clear_strikes_btn">清空好球</button><br>
-    
-    <label>出局 (O):</label>
-    <button type="button" class="counter-btn" data-key="outs" data-op="-">-</button>
-    <span class="current-value" id="outs_val">{{ data.outs or 0 }}</span>
-    <button type="button" class="counter-btn" data-key="outs" data-op="+">+</button> (Max: 3)
-    <button type="button" class="clear-btn" id="clear_outs_btn">清空出局</button><br>
+    <div class="control-group-row">
+      <label>局數:</label>
+      <input type="number" id="inning_num_input" min="1" max="99" value="1" style="width: 50px; padding: 3px; text-align: center;">
+      <button type="button" class="counter-btn" id="inning_up">上</button>
+      <button type="button" class="counter-btn" id="inning_down">下</button>
+      <button type="button" class="counter-btn" id="inning_next">下一局</button>
+      <span class="current-value" id="inning_val" style="width: 60px;">{{ data.inning or '1上' }}</span>
+    </div>
+    <div class="control-group-row">
+      <label>壞球:</label>
+      <button type="button" class="counter-btn" data-key="balls" data-op="-">-</button>
+      <span class="current-value" id="balls_val">{{ data.balls or 0 }}</span>
+      <button type="button" class="counter-btn" data-key="balls" data-op="+">+</button>
+      <button type="button" class="clear-btn" id="clear_balls_btn">清空</button>
+    </div>
+    <div class="control-group-row">
+      <label>好球:</label>
+      <button type="button" class="counter-btn" data-key="strikes" data-op="-">-</button>
+      <span class="current-value" id="strikes_val">{{ data.strikes or 0 }}</span>
+      <button type="button" class="counter-btn" data-key="strikes" data-op="+">+</button>
+      <button type="button" class="clear-btn" id="clear_strikes_btn">清空</button>
+    </div>
+    <div class="control-group-row">
+      <label>出局:</label>
+      <button type="button" class="counter-btn" data-key="outs" data-op="-">-</button>
+      <span class="current-value" id="outs_val">{{ data.outs or 0 }}</span>
+      <button type="button" class="counter-btn" data-key="outs" data-op="+">+</button>
+      <button type="button" class="clear-btn" id="clear_outs_btn">清空</button>
+    </div>
   </div>
 
   <div class="control-group">
@@ -97,7 +146,7 @@ button { padding: 10px 20px; margin-top: 10px; cursor: pointer; border: 1px soli
   <input type="hidden" name="outs" id="outs_hidden" value="{{ data.outs or 0 }}">
   <input type="hidden" name="inning" id="inning_hidden" value="{{ data.inning or '1上' }}">
   
-  <button type="submit" style="background: #00cc00; color: #fff;">廣播更新</button>
+  <button type="submit" class="submit-btn">廣播更新</button>
 </form>
 
 <script>
@@ -168,14 +217,33 @@ function getInningParts(inningStr) {
 function updateInningDisplay() {
     document.getElementById('inning_val').textContent = state.inning;
     document.getElementById('inning_hidden').value = state.inning;
+    // 同步更新數字輸入框
+    const { num } = getInningParts(state.inning);
+    document.getElementById('inning_num_input').value = num;
 }
 
+function updateInningFromInput() {
+    const numInput = document.getElementById('inning_num_input');
+    const num = parseInt(numInput.value) || 1;
+    const { half } = getInningParts(state.inning);
+    state.inning = `${num}${half}`;
+    updateInningDisplay();
+}
+
+// 數字輸入框變更事件
+document.getElementById('inning_num_input').addEventListener('change', updateInningFromInput);
+document.getElementById('inning_num_input').addEventListener('input', updateInningFromInput);
+
 document.getElementById('inning_up').onclick = () => {
-    state.inning = state.inning.replace('下', '上');
+    const numInput = document.getElementById('inning_num_input');
+    const num = parseInt(numInput.value) || 1;
+    state.inning = `${num}上`;
     updateInningDisplay();
 };
 document.getElementById('inning_down').onclick = () => {
-    state.inning = state.inning.replace('上', '下');
+    const numInput = document.getElementById('inning_num_input');
+    const num = parseInt(numInput.value) || 1;
+    state.inning = `${num}下`;
     updateInningDisplay();
 };
 document.getElementById('inning_next').onclick = () => {
@@ -183,7 +251,8 @@ document.getElementById('inning_next').onclick = () => {
     if (half === '上') {
         state.inning = `${num}下`;
     } else {
-        state.inning = `${num + 1}上`;
+        num += 1;
+        state.inning = `${num}上`;
     }
     updateInningDisplay();
 };
@@ -212,7 +281,13 @@ document.getElementById('clear_outs_btn').onclick = () => {
 // ----------------------------------------------------
 
 // 初始化所有計數器顯示
-Object.keys(state).forEach(updateDisplay);
+Object.keys(state).forEach(key => {
+    if (key !== 'inning') {
+        updateDisplay(key);
+    }
+});
+// 初始化局數顯示（包含數字輸入框）
+updateInningDisplay();
 
 // 初始化壘包顯示
 baseState.forEach((_, index) => updateBaseDisplay(index));
@@ -283,9 +358,17 @@ socket.on('update', data => {
     Object.keys(state).forEach(key => {
         if (data[key] !== undefined) {
             state[key] = typeof data[key] === 'number' ? data[key] : String(data[key]);
-            updateDisplay(key);
+            if (key !== 'inning') {
+                updateDisplay(key);
+            }
         }
     });
+
+    // 更新局數顯示（包含數字輸入框）
+    if (data.inning !== undefined) {
+        state.inning = String(data.inning);
+        updateInningDisplay();
+    }
 
     // 更新壘包狀態
     if (data.bases) {

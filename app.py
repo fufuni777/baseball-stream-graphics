@@ -16,15 +16,15 @@ score_data = {
     "away_logo_url": "",  # 客隊 Logo URL/路徑
     "home_logo_url": "",  # 主隊 Logo URL/路徑
     "away_score": 0,
-    "home_score": 2,
-    "inning": "4下",      # 局數 (4 ▽)
-    "pitcher": "廖任磊",   # 投手
-    "batter": "3 王威晨", # 打者 (包含棒次/背號)
-    "np": 5,              # 投球數
+    "home_score": 0,
+    "inning": "1上",      # 局數 (4 ▽)
+    "pitcher": "Shohei Ohtani",   # 投手
+    "batter": "9 大谷翔平", # 打者 (包含棒次/背號)
+    "np": 0,              # 投球數
     "avg": ".292",        # 打擊率
-    "balls": 2,           # 壞球 (B)
-    "strikes": 1,         # 好球 (S)
-    "outs": 1,            # 出局 (O)
+    "balls": 0,           # 壞球 (B)
+    "strikes": 0,         # 好球 (S)
+    "outs": 0,            # 出局 (O)
     "bases": [False, False, False] # [一壘, 二壘, 三壘]
 }
 
