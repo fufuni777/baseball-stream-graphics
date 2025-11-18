@@ -34,6 +34,16 @@ body {
     font-size: 0.9em;
 }
 
+/* 投手 / NP 字體 */
+#pitcher_info {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+#np_info {
+    font-size: 0.9em;
+}
+
 .main-score-row {
     display: flex;
     align-items: center;
@@ -43,22 +53,34 @@ body {
     border-bottom: 2px solid #001f3f;
 }
 
-/* 隊徽/文字顯示區塊 */
+/* 隊徽/文字容器 */
 .team-logo {
     display: flex;
-    flex-direction: column; /* 允許垂直堆疊 */
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 3em;
-    font-weight: bold;
     margin: 0 10px;
+    max-width: 190px;        /* 給隊名一個合理寬度，避免擠到壘包 */
+    text-align: center;
+}
+
+/* 隊名文字：最多兩行，上下堆疊 */
+.team-logo span {
+    font-size: 1.35em;       /* 縮小一點的隊名字體 */
+    line-height: 1.1;
+    font-weight: bold;
     color: #fff;
     text-shadow: 1px 1px 2px #000;
-    min-width: 100px; /* 確保有足夠的空間 */
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;   /* ✅ 最多兩行 */
+    overflow: hidden;        /* 超過兩行就裁掉 */
+    word-break: break-word;  /* 中英文都可中間換行 */
 }
 
 .team-logo img {
-    max-width: 60px; /* Logo 圖片大小 */
+    max-width: 60px;
     max-height: 60px;
     object-fit: contain;
     margin-bottom: 5px;
@@ -89,26 +111,26 @@ body {
     color: #003366; 
 }
 
-
-/* 壘包佈局調整：Diamond Field 結構 - 確保不突出 */
+/* 壘包：二壘在上，一壘右下，三壘左下 */
 .bases-display {
     position: absolute;
-    right: 5px;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    width: 100px;
-    height: 100px;
-    display: block;
+    width: 90px;   /* 座標系寬 */
+    height: 90px;  /* ✅ 一定要有高度 */
+    pointer-events: none;
+    z-index: 10;
 }
 
 .base-diamond {
     position: absolute;
-    width: 24px;
-    height: 24px;
+    width: 26px;   /* ✅ 壘包加大 */
+    height: 26px;
     background: rgba(255, 255, 255, 0.3);
-    transform: rotate(45deg); 
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%) rotate(45deg);  /* 用中心點定位 */
 }
 
 .base-diamond.active {
@@ -116,25 +138,21 @@ body {
     border: 1px solid #ffaa00;
 }
 
-/* 壘包位置定義 (相對於 100x100 的容器，確保不突出) */
+/* 一壘：右下 */
 #b1 { /* 一壘 (右側) */
-    top: 50%;
-    right: 5px;
-    transform: translateY(-50%) rotate(45deg);
+    top: 74%;   /* 底邊的位置 */
+    left: 78%;  /* 右邊一點 */
 }
 
 #b2 { /* 二壘 (上側) */
-    top: 5px;
+    top: 35%;
     left: 50%;
-    transform: translateX(-50%) rotate(45deg);
 }
 
 #b3 { /* 三壘 (左側) */
-    top: 50%;
-    left: 5px;
-    transform: translateY(-50%) rotate(45deg);
+    top: 74%;
+    left: 22%;  /* 左邊一點 */
 }
-
 
 .bottom-info-row {
     display: flex;
@@ -211,7 +229,6 @@ body {
   <div class="main-score-row">
     <div class="team-logo" id="away_team_logo">
       <script>
-        // 初始載入時，如果模板有提供 logo_url，則用 JS 替換內容
         if ('{{ data.away_logo_url }}') {
             document.write('<img src="{{ data.away_logo_url }}" alt="{{ data.away_team }}">');
         }
@@ -245,29 +262,28 @@ body {
     </div>
     <div class="batter-info">
       <div id="batter_name">{{ data.batter }}</div>
-      <div id="batter_avg">AVG {{ data.avg }}</div>
     </div>
     <div class="count-outs">
       <div class="ball-strike-out">
         <span class="count-label">B</span>
+        <!-- 壞球：3 顆 -->
         <span class="count-dot ball-dot" id="ball1"></span>
         <span class="count-dot ball-dot" id="ball2"></span>
         <span class="count-dot ball-dot" id="ball3"></span>
-        <span class="count-dot ball-dot" id="ball4"></span>
       </div>
       
       <div class="ball-strike-out">
         <span class="count-label">S</span>
+        <!-- 好球：2 顆 -->
         <span class="count-dot strike-dot" id="strike1"></span>
         <span class="count-dot strike-dot" id="strike2"></span>
-        <span class="count-dot strike-dot" id="strike3"></span>
       </div>
 
       <div class="ball-strike-out">
         <span class="count-label">O</span>
+        <!-- 出局：2 顆 -->
         <span class="count-dot out-dot" id="out1"></span>
         <span class="count-dot out-dot" id="out2"></span>
-        <span class="count-dot out-dot" id="out3"></span>
       </div>
     </div>
   </div>
@@ -275,6 +291,7 @@ body {
 
 <script>
 const socket = io();
+
 // 追蹤上一次的分數
 let lastScores = {
     away_score: parseInt('{{ data.away_score }}') || 0,
@@ -288,7 +305,6 @@ function flashScore(elementId, newScore, oldScore) {
     if (newS > oldS) {
         const element = document.getElementById(elementId);
         element.classList.add('score-flash');
-
         setTimeout(() => {
             element.classList.remove('score-flash');
         }, FLASH_DURATION);
@@ -323,7 +339,7 @@ function formatInning(inningStr) {
 
 function updateTeamLogo(teamElementId, teamName, logoUrl) {
     const teamElement = document.getElementById(teamElementId);
-    teamElement.innerHTML = ''; // 清空現有內容
+    teamElement.innerHTML = '';
 
     let textSpan = document.createElement('span');
     textSpan.textContent = teamName || '';
@@ -333,50 +349,45 @@ function updateTeamLogo(teamElementId, teamName, logoUrl) {
         img.src = logoUrl;
         img.alt = teamName;
         teamElement.appendChild(img);
-        teamElement.style.fontSize = '1.5em'; 
-    } else {
-        teamElement.style.fontSize = '3em'; // 如果沒有 Logo，使用原始大字體
     }
     
     teamElement.appendChild(textSpan);
 }
 
-
 socket.on('update', data => {
     const mergedData = { 
         away_team: '客隊', home_team: '主隊', away_score: 0, home_score: 0,
-        inning: '1上', pitcher: '投手', batter: '打者', np: 0, avg: '.000',
+        inning: '1上', pitcher: '投手', batter: '打者', np: 0,
         balls: 0, strikes: 0, outs: 0, bases: [false, false, false],
-        away_logo_url: '', home_logo_url: '', // 確保有預設值
+        away_logo_url: '', home_logo_url: '',
         ...data
     };
 
     const currentAwayScore = parseInt(mergedData.away_score);
     const currentHomeScore = parseInt(mergedData.home_score);
 
-    // 1. 處理分數高亮
+    // 1. 分數高亮
     flashScore('away_score', currentAwayScore, lastScores.away_score);
     flashScore('home_score', currentHomeScore, lastScores.home_score);
     
-    // 2. 更新隊徽/隊名
+    // 2. 隊徽/隊名
     updateTeamLogo('away_team_logo', mergedData.away_team, mergedData.away_logo_url);
     updateTeamLogo('home_team_logo', mergedData.home_team, mergedData.home_logo_url);
 
-    // 3. 更新其他資訊
+    // 3. 其他資訊
     document.getElementById('away_score').textContent = currentAwayScore;
     document.getElementById('home_score').textContent = currentHomeScore;
     document.getElementById('pitcher_info').textContent = `P ${mergedData.pitcher}`;
     document.getElementById('np_info').textContent = `NP: ${mergedData.np}`;
     document.getElementById('inning').textContent = formatInning(mergedData.inning);
-    document.getElementById('batter_name').textContent = mergedData.batter;
-    document.getElementById('batter_avg').textContent = `AVG ${mergedData.avg}`;
+    document.getElementById('batter_name').textContent = `H ${mergedData.batter}`;
 
-    updateDots('ball', 4, mergedData.balls);
-    updateDots('strike', 3, mergedData.strikes);
-    updateDots('out', 3, mergedData.outs);
+    // B: 3 顆, S: 2 顆, O: 2 顆
+    updateDots('ball', 3, mergedData.balls);
+    updateDots('strike', 2, mergedData.strikes);
+    updateDots('out', 2, mergedData.outs);
     updateBases(mergedData.bases);
 
-    // 4. 更新 lastScores 供下次比較
     lastScores.away_score = currentAwayScore;
     lastScores.home_score = currentHomeScore;
 });
@@ -386,9 +397,16 @@ window.onload = () => {
     if (initialInning) {
         initialInning.textContent = formatInning(initialInning.textContent.trim());
     }
-    // 初始載入時也要確保隊伍 logo/文字正確顯示
-    updateTeamLogo('away_team_logo', document.querySelector('#away_team_logo span').textContent, '{{ data.away_logo_url }}');
-    updateTeamLogo('home_team_logo', document.querySelector('#home_team_logo span').textContent, '{{ data.home_logo_url }}');
+    updateTeamLogo(
+        'away_team_logo',
+        document.querySelector('#away_team_logo span').textContent,
+        '{{ data.away_logo_url }}'
+    );
+    updateTeamLogo(
+        'home_team_logo',
+        document.querySelector('#home_team_logo span').textContent,
+        '{{ data.home_logo_url }}'
+    );
 };
 </script>
 </body>
