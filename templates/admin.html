@@ -171,8 +171,8 @@ button {
              value="{{ data.away_team or '' }}" style="width: 80px; display:none;">
 
       <label>Logo:</label> 
-      <input name="away_logo_url" id="away_logo_url_input" placeholder="URL" 
-             value="{{ data.away_logo_url or '' }}" style="width: 150px;">
+      <input name="away_logo_url" id="away_logo_url_input" placeholder="away_logo.png" 
+      value="{{ data.away_logo_url or '' }}" style="width: 150px;">
 
       <!-- 主隊：下拉選單 + 隱藏 input -->
       <label>主隊文字:</label> 
@@ -188,8 +188,8 @@ button {
              value="{{ data.home_team or '' }}" style="width: 80px; display:none;">
 
       <label>Logo:</label> 
-      <input name="home_logo_url" id="home_logo_url_input" placeholder="URL" 
-             value="{{ data.home_logo_url or '' }}" style="width: 150px;">
+      <input name="home_logo_url" id="home_logo_url_input" placeholder="home_logo.png" 
+      value="{{ data.home_logo_url or '' }}" style="width: 150px;">
     </div>
 
     <div class="control-group-row">
@@ -409,6 +409,22 @@ if (recordPaBtn && paResultSelect) {
 
 
 // ------------------ 共用輔助函數 ------------------
+
+// 把使用者輸入的 LOGO 欄位（可能是檔名或完整 URL）轉成真正要送出的 URL
+function buildLogoUrl(raw) {
+    const v = (raw || '').trim();
+    if (!v) return '';
+
+    // 如果本來就打 http(s) 或以 / 開頭，就當成完整 URL 直接用
+    if (/^https?:\/\//i.test(v) || v.startsWith('/')) {
+        return v;
+    }
+
+    // 否則當成檔名，自動補上 Flask static 路徑
+    // 這裡假設 logo 放在 static/logos 底下，可以依你的實際路徑調整
+    return `/static/logos/${v}`;
+}
+
 function updateDisplay(key) {
     const displayEl = document.getElementById(`${key}_val`);
     const hiddenEl  = document.getElementById(`${key}_hidden`);
@@ -689,8 +705,12 @@ document.getElementById('control').onsubmit = e => {
     data.inning     = state.inning;
     data.bases      = baseState;
 
-    data.away_logo_url = document.getElementById('away_logo_url_input').value.trim();
-    data.home_logo_url = document.getElementById('home_logo_url_input').value.trim();
+    data.away_logo_url = buildLogoUrl(
+        document.getElementById('away_logo_url_input').value
+    );
+    data.home_logo_url = buildLogoUrl(
+        document.getElementById('home_logo_url_input').value
+    );
 
     // ⭐⭐ 關鍵：用「目前 select 選到的打者」，並且無論有沒有紀錄都送出一個陣列
     const currentBatter =
