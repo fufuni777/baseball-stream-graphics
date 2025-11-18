@@ -285,6 +285,39 @@ button {
     <button type="button" class="base-button base-inactive" id="base_b3" data-index="2">三壘</button>
   </div>
   
+  <!-- =================== 打席紀錄（只存在本控制台的記憶體） =================== -->
+  <div class="control-group">
+    <h3>打席紀錄（本控制台暫存）</h3>
+    <div class="control-group-row">
+      <label>本打席結果:</label>
+      <select id="pa_result_select" style="width: 130px;">
+        <option value="">選擇結果</option>
+        <option value="1B">1B</option>
+        <option value="2B">2B</option>
+        <option value="3B">3B</option>
+        <option value="HR">HR</option>
+        <option value="BB">BB</option>
+        <option value="HBP">HBP</option>
+        <option value="SF">SF</option>
+        <option value="SAC">SAC</option>
+        <option value="GO">GO</option>
+        <option value="AO">AO</option>
+        <option value="K">K</option>
+        <option value="DP">DP</option>
+        <option value="E">E</option>
+      </select>
+      <button type="button" id="record_pa_btn">記錄打席</button>
+    </div>
+    <div class="control-group-row">
+      <label>此打者前幾打席:</label>
+      <div id="pa_history_display"
+           style="font-size:0.85em; white-space:pre-line; max-width:100%;">
+        （目前沒有打席紀錄）
+      </div>
+    </div>
+  </div>
+
+
   <!-- 隱藏欄位 -->
   <input type="hidden" name="bases" id="bases_hidden" value="{{ data.bases | join(',') }}">
   <input type="hidden" name="away_score" id="away_score_hidden" value="{{ data.away_score or 0 }}">
@@ -336,6 +369,9 @@ state.balls   = clamp(state.balls,   3);
 state.strikes = clamp(state.strikes, 2);
 state.outs    = clamp(state.outs,    2);
 
+// ------------------ 打席紀錄（前端暫存） ------------------
+const batterLogs = {};
+
 // ------------------ 投球數輸入框 ------------------
 const npInput = document.getElementById('np_val');
 if (npInput) {
@@ -356,6 +392,21 @@ const baseButtons = [
     document.getElementById('base_b3')
 ];
 const basesHiddenInput = document.getElementById('bases_hidden');
+
+// ------------------ 打席紀錄輸入區事件 ------------------
+const paResultSelect = document.getElementById('pa_result_select');
+const recordPaBtn    = document.getElementById('record_pa_btn');
+
+if (recordPaBtn && paResultSelect) {
+    recordPaBtn.addEventListener('click', () => {
+        const val = paResultSelect.value;
+        if (!val) return;  // 沒選結果就不記
+
+        appendBatterPA(val);   // 寫入前端暫存 + 更新「此打者前幾打席」
+        paResultSelect.value = '';  // 記錄完把選單清空
+    });
+}
+
 
 // ------------------ 共用輔助函數 ------------------
 function updateDisplay(key) {
@@ -391,6 +442,54 @@ function handleCounter(key, op, max = Infinity, min = 0) {
         updateDisplay(key);
     }
 }
+
+// 取得目前打者的名字（優先用 input，再用 select）
+function getCurrentBatterName() {
+    return (batterInput.value || batterSelect.value || '').trim();
+}
+
+// 把某個打者的紀錄渲染到畫面上的 pa_history_display
+function renderBatterHistory(batterName) {
+    const el = document.getElementById('pa_history_display');
+    if (!el) return;
+
+    batterName = batterName || getCurrentBatterName();
+    const list = batterLogs[batterName] || [];
+
+    if (list.length === 0) {
+        el.textContent = '（目前沒有打席紀錄）';
+        return;
+    }
+
+    // 只顯示最近 5 次打席
+    const lastN = list.slice(-5);
+    const lines = lastN.map(item => {
+        return `第 ${item.pa} 打席（${item.inning}）：${item.result}`;
+    });
+
+    el.textContent = lines.join('\n');
+}
+
+// 實際新增一筆打席紀錄
+function appendBatterPA(resultText) {
+    const batterName = getCurrentBatterName();
+    if (!batterName) return;  // 沒選打者就不記
+
+    if (!batterLogs[batterName]) {
+        batterLogs[batterName] = [];
+    }
+    const paList = batterLogs[batterName];
+
+    const newItem = {
+        pa: paList.length + 1,
+        inning: state.inning || '1上',
+        result: resultText.trim()
+    };
+    paList.push(newItem);
+
+    renderBatterHistory(batterName);
+}
+
 
 // ------------------ 填入球員名單 ------------------
 function fillPlayersForTeam(teamCode, selectEl, currentValue = null) {
@@ -447,6 +546,8 @@ function updatePlayersByInning() {
 function initTeamAndPlayers() {
     syncTeamInputsFromSelect();
     updatePlayersByInning();
+    // 初始化時顯示目前打者的打席紀錄（如果有的話）
+    renderBatterHistory(getCurrentBatterName());
 }
 
 // 隊伍選單變更 → 重新依局數套用名單
@@ -465,6 +566,15 @@ pitcherSelect.addEventListener('change', () => {
 });
 batterSelect.addEventListener('change', () => {
     batterInput.value = batterSelect.value || '';
+
+    // 切換打者時，更新右邊的「前幾打席」
+    renderBatterHistory(batterInput.value.trim());
+
+    // 如果有打席結果下拉選單，就順便清空
+    const paResultSelect = document.getElementById('pa_result_select');
+    if (paResultSelect) {
+        paResultSelect.value = '';
+    }
 });
 
 // ------------------ 局數顯示 & 操作 ------------------
@@ -581,6 +691,21 @@ document.getElementById('control').onsubmit = e => {
 
     data.away_logo_url = document.getElementById('away_logo_url_input').value.trim();
     data.home_logo_url = document.getElementById('home_logo_url_input').value.trim();
+
+    // ⭐⭐ 關鍵：用「目前 select 選到的打者」，並且無論有沒有紀錄都送出一個陣列
+    const currentBatter =
+        (batterSelect && batterSelect.value
+            ? batterSelect.value
+            : (batterInput.value || '')
+        ).trim();
+
+    let logs = [];
+    if (typeof batterLogs !== 'undefined' && currentBatter) {
+        logs = batterLogs[currentBatter] || [];
+    }
+    console.log('submit batter =', currentBatter, 'logs =', logs);
+    // 永遠送出最近幾次（即使是 []），讓前端知道要清空
+    data.batter_pa_recent = logs.slice(-5);
 
     Object.keys(data).forEach(key => {
         if (typeof data[key] === 'string' && data[key].trim() === '') {

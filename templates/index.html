@@ -172,8 +172,19 @@ body {
 
 .batter-info {
     flex-grow: 1;
-    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
     margin-right: 10px;
+    white-space: nowrap;
+}
+
+.batter-pa {
+    font-size: 0.8em;
+    opacity: 0.9;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .count-outs {
@@ -261,8 +272,10 @@ body {
       <div id="inning">{{ data.inning }}</div> 
     </div>
     <div class="batter-info">
-      <div id="batter_name">{{ data.batter }}</div>
-    </div>
+        <span id="batter_name">{{ data.batter }}</span>
+        <span id="batter_pa_recent" class="batter-pa"></span>
+      </div>
+      
     <div class="count-outs">
       <div class="ball-strike-out">
         <span class="count-label">B</span>
@@ -355,11 +368,14 @@ function updateTeamLogo(teamElementId, teamName, logoUrl) {
 }
 
 socket.on('update', data => {
+    console.log("update raw data =", data);
+    
     const mergedData = { 
         away_team: '客隊', home_team: '主隊', away_score: 0, home_score: 0,
         inning: '1上', pitcher: '投手', batter: '打者', np: 0,
         balls: 0, strikes: 0, outs: 0, bases: [false, false, false],
         away_logo_url: '', home_logo_url: '',
+        batter_pa_recent: [],
         ...data
     };
 
@@ -381,6 +397,23 @@ socket.on('update', data => {
     document.getElementById('np_info').textContent = `NP: ${mergedData.np}`;
     document.getElementById('inning').textContent = formatInning(mergedData.inning);
     document.getElementById('batter_name').textContent = `H ${mergedData.batter}`;
+    // 顯示目前打者最近幾次打席
+    const paRecentDiv = document.getElementById('batter_pa_recent');
+    if (paRecentDiv) {
+        const arr = mergedData.batter_pa_recent || [];
+
+        if (Array.isArray(arr) && arr.length > 0) {
+            // 只顯示 result
+            const results = arr
+                .map(item => (item && item.result ? String(item.result) : ''))
+                .filter(x => x !== '');
+            
+            paRecentDiv.textContent = results.join(' ／ ');
+        } else {
+            paRecentDiv.textContent = '';
+        }
+    }
+
 
     // B: 3 顆, S: 2 顆, O: 2 顆
     updateDots('ball', 3, mergedData.balls);
