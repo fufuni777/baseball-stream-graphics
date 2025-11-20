@@ -27,9 +27,10 @@ body {
 
 .top-bar {
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
     background: rgba(0, 0, 0, 0.7);
+    /* 修改處：左右 padding 皆設為 15px，讓 inning 靠右時有對稱的邊距 */
     padding: 5px 15px;
     font-size: 0.9em;
 }
@@ -39,6 +40,11 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;    /* 投手與 NP 之間的距離 */
+}
+
+.top-bar-right {
+    display: flex;
+    align-items: center;
 }
 
 /* 投手 / NP 字體 */
@@ -168,11 +174,16 @@ body {
     background: #001f3f;
     padding: 8px 15px;
     font-size: 1.1em;
+    gap: 20px;
 }
 
 .inning-info {
     display: flex;
     align-items: center;
+    /* 修改處：強制內容靠右對齊 */
+    justify-content: flex-end; 
+    text-align: right;
+    
     font-weight: bold;
     min-width: 100px;
 }
@@ -240,6 +251,11 @@ body {
       <div class="data-field" id="pitcher_info">P {{ data.pitcher }}</div>
       <div class="data-field" id="np_info">NP: {{ data.np }}</div>
     </div>
+    <div class="top-bar-right">
+      <div class="inning-info">
+        <div id="inning">{{ data.inning }}</div> 
+      </div>
+    </div>
   </div>
 
   <div class="main-score-row">
@@ -273,18 +289,13 @@ body {
   </div>
 
   <div class="bottom-info-row">
-    <div class="inning-info">
-      <div id="inning">{{ data.inning }}</div> 
-    </div>
     <div class="batter-info">
         <span id="batter_name">{{ data.batter }}</span>
         <span id="batter_pa_recent" class="batter-pa"></span>
       </div>
-      
     <div class="count-outs">
       <div class="ball-strike-out">
         <span class="count-label">B</span>
-        <!-- 壞球：3 顆 -->
         <span class="count-dot ball-dot" id="ball1"></span>
         <span class="count-dot ball-dot" id="ball2"></span>
         <span class="count-dot ball-dot" id="ball3"></span>
@@ -292,14 +303,12 @@ body {
       
       <div class="ball-strike-out">
         <span class="count-label">S</span>
-        <!-- 好球：2 顆 -->
         <span class="count-dot strike-dot" id="strike1"></span>
         <span class="count-dot strike-dot" id="strike2"></span>
       </div>
 
       <div class="ball-strike-out">
         <span class="count-label">O</span>
-        <!-- 出局：2 顆 -->
         <span class="count-dot out-dot" id="out1"></span>
         <span class="count-dot out-dot" id="out2"></span>
       </div>

@@ -146,6 +146,29 @@ button {
         flex-direction: column;
     }
 }
+/* 右下角更新成功提示框 */
+#toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 200, 0, 0.9);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 9999;
+}
+
+#toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 </style>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 </head>
@@ -330,7 +353,7 @@ button {
   
   <button type="submit" class="submit-btn">廣播更新</button>
 </form>
-
+<div id="toast">更新成功</div>
 <script>
 // ================== 後端資料 & DOM 取得 ==================
 const PLAYERS_BY_TEAM = {{ players_by_team | tojson }};
@@ -449,15 +472,40 @@ function updateBaseDisplay(index) {
     basesHiddenInput.value = baseState.join(',');
 }
 
-function handleCounter(key, op, max = Infinity, min = 0) {
-    const change = op === '+' ? 1 : -1;
-    let newValue = state[key] + change;
-    newValue = Math.max(min, Math.min(max, newValue));
-    if (state[key] !== newValue) {
-        state[key] = newValue;
-        updateDisplay(key);
-    }
+// ------------------ Toast 提示 ------------------
+let toastTimer = null;
+function showToast(message = '更新成功') {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.classList.add('show');
+
+    // 重設計時器，幾秒後關閉
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);  // 3 秒後消失
 }
+
+
+function handleCounter(key, op, max = Infinity, min = 0, wrap = false) {
+    const current = state[key] ?? 0;
+
+    if (op === '+') {
+        if (wrap && current >= max) {
+            // 到上限再按 + 就從 min（這裡都是 0）開始
+            state[key] = min;
+        } else {
+            state[key] = Math.min(max, current + 1);
+        }
+    } else if (op === '-') {
+        state[key] = Math.max(min, current - 1);
+    }
+
+    updateDisplay(key);
+}
+
 
 // 取得目前打者的名字（優先用 input，再用 select）
 function getCurrentBatterName() {
@@ -663,22 +711,95 @@ Object.keys(state).forEach(key => {
 updateInningDisplay();
 baseState.forEach((_, index) => updateBaseDisplay(index));
 
-// 綁定計數按鈕（含壞球 / 好球 / 出局上限）
+// 綁定計數按鈕（含壞球 / 好球 / 出局上限＋循環）
 document.querySelectorAll('.counter-btn').forEach(button => {
     const key = button.getAttribute('data-key');
     const op = button.getAttribute('data-op');
 
-    if (key) {
-        button.onclick = () => {
-            let max;
-            if (key === 'balls')      max = 3;
-            else if (key === 'strikes') max = 2;
-            else if (key === 'outs')    max = 2;
-            else max = Infinity;
-            handleCounter(key, op, max);
-        };
+    if (!key) return;
+
+    button.onclick = () => {
+        let max = Infinity;
+        let wrap = false;
+
+        if (key === 'balls') {
+            max = 3;
+            wrap = (op === '+');  // 壞球 + 才循環
+        } else if (key === 'strikes') {
+            max = 2;
+            wrap = (op === '+');  // 好球 + 才循環
+        } else if (key === 'outs') {
+            max = 2;
+            wrap = (op === '+');  // 出局 + 才循環
+        }
+
+        handleCounter(key, op, max, 0, wrap);
+    };
+});
+
+
+// ------------------ 鍵盤快捷鍵 ------------------
+// 投球數 - / +、壞球 +、好球 +、出局 +、廣播更新
+document.addEventListener('keydown', (e) => {
+    const tag = e.target.tagName;
+    const isTyping =
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        tag === 'SELECT' ||
+        e.target.isContentEditable;
+
+    // 如果正在輸入欄位打字，就不要吃快捷鍵，避免干擾輸入
+    if (isTyping) return;
+
+    switch (e.key) {
+        // 投球數 - （- 鍵）
+        case '-':
+            handleCounter('np', '-', Infinity, 0, false);
+            e.preventDefault();
+            break;
+
+        // 投球數 + （= 或 Shift + = 變成 +）
+        case '+':
+        case '=':
+            handleCounter('np', '+', Infinity, 0, false);
+            e.preventDefault();
+            break;
+
+        // 壞球 + （B / b）
+        case '1':
+            handleCounter('balls', '+', 3, 0, true);
+            e.preventDefault();
+            break;
+
+        // 好球 + （S / s）
+        case '2':
+            handleCounter('strikes', '+', 2, 0, true);
+            e.preventDefault();
+            break;
+
+        // 出局 + （O / o）
+        case '3':
+            handleCounter('outs', '+', 2, 0, true);
+            e.preventDefault();
+            break;
+
+        // 廣播更新（Enter）
+        case 'Enter': {
+            const form = document.getElementById('control');
+            if (form) {
+                // 盡量用 requestSubmit，比較符合標準
+                if (typeof form.requestSubmit === 'function') {
+                    form.requestSubmit();
+                } else {
+                    form.submit();
+                }
+                e.preventDefault();
+            }
+            break;
+        }
     }
 });
+
 
 // 壘包按鈕
 baseButtons.forEach((button, index) => {
@@ -734,6 +855,7 @@ document.getElementById('control').onsubmit = e => {
     });
 
     socket.emit('update', data);
+    showToast('更新成功');
 };
 
 // Socket 接收 → 多控制台同步
