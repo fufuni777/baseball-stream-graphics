@@ -2,908 +2,808 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>控制台</title>
+<title>棒球中控台 (修正版)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-html, body { 
-    font-family: "Noto Sans TC", sans-serif; 
-    background: #111; 
-    color: #fff; 
-    margin: 0; 
-    padding: 0;
-    height: 100vh;
-    width: 100vw;
-    overflow: auto;
-}
-body { padding: 5px; }
-h1 { margin: 3px 0 8px; font-size: 1.2em; }
-h2 { margin: 3px 0; font-size: 1em; }
-
-/* 整個表單垂直排版 + 置中 */
-form { 
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 8px 12px 40px;
-    height: auto;
-}
-
-/* input / select / button 基本樣式 */
-input, select { 
-    margin: 2px; 
-    padding: 3px 5px; 
-    font-size: 0.9em; 
-}
-button { 
-    padding: 6px 12px; 
-    margin: 2px; 
-    cursor: pointer; 
-    border: 1px solid #fff; 
-    font-size: 0.85em; 
-}
-
-/* 壘包按鈕 */
-.base-button { 
-    width: 70px; 
-    margin: 2px; 
-    font-size: 0.85em; 
-}
-.base-active { 
-    background-color: #ffcc00; 
-    color: #111; 
-    font-weight: bold; 
-    border-color: #ffaa00; 
-}
-.base-inactive { 
-    background-color: #333; 
-    color: #fff; 
-}
-
-/* 每一塊控制區塊做成卡片 */
-.control-group { 
-    margin: 0; 
-    border: 1px solid #444; 
-    background: #181818;
-    padding: 10px 12px; 
-    border-radius: 6px; 
-    font-size: 0.9em;
-}
-.control-group h3 { 
-    margin: 2px 0 6px 0; 
-    font-size: 0.95em; 
-}
-
-/* 每一行用 flex 排版 */
-.control-group-row { 
-    margin: 4px 0; 
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-}
-.control-group-row label { 
-    font-size: 0.85em; 
-    display: inline-block; 
-    min-width: auto; 
-}
-
-/* 數字顯示 / 輸入欄位統一寬度 */
-.counter-btn { 
-    width: 35px; 
-    margin: 0 3px; 
-    background: #555; 
-    color: #fff; 
-    padding: 4px; 
-    font-size: 0.9em; 
-}
-.current-value { 
-    display: inline-block; 
-    width: 60px; 
-    text-align: center; 
-    margin: 0; 
-    font-weight: bold; 
-    font-size: 1em;
-    padding: 3px 5px;
-}
-.clear-btn { 
-    background: #cc0000; 
-    color: #fff; 
-    border: none; 
-    padding: 4px 8px; 
-    margin-left: 5px; 
-    cursor: pointer; 
-    font-size: 0.8em;
-}
-
-/* 隊伍設定那塊多一點 padding */
-.team-info-group { 
-    padding-top: 12px; 
-    padding-bottom: 12px; 
-}
-
-/* 中間兩塊左右並排 */
-.panel-row {
-    display: flex;
-    gap: 10px;
-}
-.panel-row .control-group {
-    flex: 1;
-}
-
-/* 廣播按鈕靠左即可 */
-.submit-btn { 
-    align-self: flex-start;
-    background: #00cc00; 
-    color: #fff; 
-    padding: 8px 16px; 
-    margin-top: 5px;
-}
-
-/* 小螢幕改成上下排 */
-@media (max-width: 768px) {
-    .panel-row {
-        flex-direction: column;
+    /* ================= 全域樣式 ================= */
+    html, body { 
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif; 
+        background: #1a1a1a; 
+        color: #ddd; 
+        margin: 0; 
+        padding: 10px; 
+        padding-bottom: 80px; 
     }
-}
-/* 右下角更新成功提示框 */
-#toast {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(0, 200, 0, 0.9);
-    color: #fff;
-    padding: 8px 14px;
-    border-radius: 4px;
-    font-size: 0.85em;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(10px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    z-index: 9999;
-}
+    h1, h2, h3 { margin: 5px 0; font-weight: bold; }
+    input, select { 
+        padding: 6px; 
+        background: #333; 
+        color: white; 
+        border: 1px solid #555; 
+        border-radius: 4px; 
+        font-size: 1rem;
+    }
+    input:focus, select:focus { border-color: #f1c40f; outline: none; }
+    
+    button { 
+        cursor: pointer; padding: 6px 12px; border-radius: 4px; border: none; 
+        font-weight: bold; font-size: 0.95rem; transition: filter 0.2s;
+    }
+    button:hover { filter: brightness(1.2); }
+    button:active { transform: scale(0.98); }
 
-#toast.show {
-    opacity: 1;
-    transform: translateY(0);
-}
+    .btn-green { background: #27ae60; color: white; }
+    .btn-red { background: #c0392b; color: white; }
+    .btn-blue { background: #2980b9; color: white; }
+    .btn-yellow { background: #f39c12; color: black; }
+    .btn-gray { background: #7f8c8d; color: white; }
 
+    .main-container { display: flex; flex-wrap: wrap; gap: 15px; max-width: 1400px; margin: 0 auto; }
+    .section-card { 
+        background: #2c2c2c; border: 1px solid #444; border-radius: 8px; 
+        padding: 15px; flex: 1 1 350px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    .section-title { 
+        border-bottom: 2px solid #555; padding-bottom: 8px; margin-bottom: 12px; 
+        font-size: 1.1rem; color: #f1c40f; font-weight: bold;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .counter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .counter-label { width: 50px; font-weight: bold; }
+    .counter-val { font-size: 1.5rem; font-weight: bold; width: 40px; text-align: center; display: inline-block; color: #fff; }
+    .base-check { transform: scale(1.5); margin-right: 5px; }
+    .base-label { margin-right: 15px; cursor: pointer; font-size: 1.1rem;}
+
+    .score-display { font-size: 3.5rem; font-weight: 900; margin: 10px 0; }
+    .team-input-row { display: flex; gap: 5px; justify-content: center; align-items: center; }
+    .logo-input { width: 48%; font-size: 0.8rem; color: #aaa; }
+
+    .box-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; text-align: center; margin-bottom: 10px; }
+    .box-header { font-size: 0.9rem; color: #aaa; padding-bottom: 2px;}
+    .box-cell input { width: 100%; text-align: center; font-size: 1.2rem; padding: 4px 0; background: #444; border: 1px solid #555; }
+    .box-cell input:focus { background: #555; border-color: #f1c40f; }
+
+    .team-control-row { border-left: 6px solid #555; padding-left: 15px; }
+    .team-away { border-color: #3498db; } 
+    .team-home { border-color: #27ae60; } 
+
+    .lineup-toggle { width: 100%; text-align: left; background: #3a3a3a; margin-top: 10px; font-size: 0.9rem; }
+    .lineup-area { display: none; background: #222; padding: 10px; border-radius: 4px; margin-top: 5px; border: 1px solid #444; }
+    .lineup-area.show { display: block; }
+    .lineup-row { display: flex; align-items: center; margin-bottom: 5px; }
+    .lineup-num { width: 25px; color: #888; font-weight: bold; text-align: right; margin-right: 8px; }
+
+    .rhe-ctrl { display: flex; gap: 15px; background: #222; padding: 8px; border-radius: 4px; margin-bottom: 10px; align-items: center; }
+    .rhe-item span { color: #aaa; margin-right: 5px; font-size: 0.9rem; }
+
+    /* 計時器樣式 */
+    .timer-display-admin {
+        font-family: 'Courier New', monospace; font-size: 2.5rem; font-weight: bold;
+        background: #000; color: #0f0; padding: 10px; border-radius: 5px;
+        text-align: center; margin: 10px 0; border: 2px solid #444;
+    }
+    .timer-controls { display: flex; gap: 10px; justify-content: center; }
+    .timer-alert-mode { color: #fff; background: #c0392b; }
+
+    /* 底部懸浮列 */
+    .submit-bar {
+        position: fixed; bottom: 0; left: 0; width: 100%; 
+        background: rgba(20, 20, 20, 0.95); padding: 12px; 
+        border-top: 1px solid #f1c40f; z-index: 999;
+        display: flex; justify-content: center; align-items: center; gap: 20px;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+    }
+    .submit-btn { 
+        background: linear-gradient(135deg, #e74c3c, #c0392b); 
+        color: white; font-size: 1.4rem; padding: 12px 60px; border-radius: 50px; 
+        box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4); letter-spacing: 1px;
+    }
+    .status-light { width: 12px; height: 12px; border-radius: 50%; background: #555; display: inline-block; margin-right: 5px; }
+    .status-connected { background: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
+
+    #toast {
+        position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+        background: #2ecc71; color: #000; padding: 5px 15px; border-radius: 20px;
+        font-weight: bold; opacity: 0; transition: opacity 0.5s; pointer-events: none;
+    }
 </style>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 </head>
 <body>
-<h1>計分板控制台</h1>
 
-<form id="control">
-  <!-- =================== 隊伍設定 =================== -->
-  <div class="control-group team-info-group">
-    <h3>隊伍設定</h3>
-    <div class="control-group-row">
-      <!-- 客隊：下拉選單 + 隱藏 input -->
-      <label>客隊文字:</label> 
-      <select id="away_team_select" style="width: 80px;">
-        {% for team_code in players_by_team.keys() %}
-          <option value="{{ team_code }}"
-            {% if team_code == data.away_team %}selected{% endif %}>
-            {{ team_code }}
-          </option>
-        {% endfor %}
-      </select>
-      <input name="away_team" id="away_team_input" placeholder="G"
-             value="{{ data.away_team or '' }}" style="width: 80px; display:none;">
+<h1 style="text-align:center; color:#f1c40f;">⚾ 比賽中控台</h1>
 
-      <label>Logo:</label> 
-      <input name="away_logo_url" id="away_logo_url_input" placeholder="away_logo.png" 
-      value="{{ data.away_logo_url or '' }}" style="width: 150px;">
-
-      <!-- 主隊：下拉選單 + 隱藏 input -->
-      <label>主隊文字:</label> 
-      <select id="home_team_select" style="width: 80px;">
-        {% for team_code in players_by_team.keys() %}
-          <option value="{{ team_code }}"
-            {% if team_code == data.home_team %}selected{% endif %}>
-            {{ team_code }}
-          </option>
-        {% endfor %}
-      </select>
-      <input name="home_team" id="home_team_input" placeholder="B"
-             value="{{ data.home_team or '' }}" style="width: 80px; display:none;">
-
-      <label>Logo:</label> 
-      <input name="home_logo_url" id="home_logo_url_input" placeholder="home_logo.png" 
-      value="{{ data.home_logo_url or '' }}" style="width: 150px;">
+<div class="main-container">
+    <div class="section-card">
+        <div class="section-title">狀態控制 (BSO)</div>
+        <div class="counter-row">
+            <span class="counter-label" style="color:#3498db">Ball</span>
+            <button class="btn-blue" onclick="adj('balls', 1)">+1</button>
+            <span class="counter-val" id="disp_balls">0</span>
+            <button class="btn-blue" onclick="adj('balls', -1)">-1</button>
+            <button class="btn-gray" style="margin-left:auto" onclick="adj('balls', -99)">歸零</button>
+        </div>
+        <div class="counter-row">
+            <span class="counter-label" style="color:#f1c40f">Strike</span>
+            <button class="btn-yellow" onclick="adj('strikes', 1)">+1</button>
+            <span class="counter-val" id="disp_strikes">0</span>
+            <button class="btn-yellow" onclick="adj('strikes', -1)">-1</button>
+            <button class="btn-gray" style="margin-left:auto" onclick="adj('strikes', -99)">歸零</button>
+        </div>
+        <div class="counter-row">
+            <span class="counter-label" style="color:#e74c3c">Out</span>
+            <button class="btn-red" onclick="adj('outs', 1)">+1</button>
+            <span class="counter-val" id="disp_outs">0</span>
+            <button class="btn-red" onclick="adj('outs', -1)">-1</button>
+            <button class="btn-gray" style="margin-left:auto" onclick="adj('outs', -99)">歸零</button>
+        </div>
+        <hr style="border-color:#444; margin: 15px 0;">
+        <div style="display:flex; justify-content:space-around;">
+            <label class="base-label"><input type="checkbox" class="base-check" id="base1">一壘</label>
+            <label class="base-label"><input type="checkbox" class="base-check" id="base2">二壘</label>
+            <label class="base-label"><input type="checkbox" class="base-check" id="base3">三壘</label>
+        </div>
     </div>
 
-    <div class="control-group-row">
-      <!-- 投手：下拉選單 + 隱藏 input -->
-      <label>投手:</label> 
-      <select id="pitcher_select" style="width: 140px;"></select>
-      <input name="pitcher" id="pitcher_input" placeholder="投手" 
-             value="{{ data.pitcher or '' }}" style="width: 120px; display:none;">
+    <div class="section-card">
+        <div class="section-title">
+            局數與投打
+            <!-- 局數控制改為數字+按鈕 -->
+            <div style="font-size:0.8rem; font-weight:normal;">
+               局數控制
+            </div>
+        </div>
 
-      <!-- 打者：下拉選單 + 隱藏 input -->
-      <label>打者:</label> 
-      <select id="batter_select" style="width: 140px;"></select>
-      <input name="batter" id="batter_input" placeholder="3 王威晨" 
-             value="{{ data.batter or '' }}" style="width: 120px; display:none;">
+        <div class="counter-row">
+            <span style="width:50px;">局數:</span>
+            <button class="btn-gray" onclick="adjInning(-1)">-</button>
+            <span id="disp_inn_num" class="counter-val" style="width:40px;">1</span>
+            <button class="btn-gray" onclick="adjInning(1)">+</button>
+            <button class="btn-blue" id="btn_inn_half" onclick="toggleInningHalf()" style="margin-left:5px;">上</button>
+        </div>
 
-      <!-- 打擊率 -->
-      <label>打擊率:</label>
-      <input name="avg" id="avg_input" placeholder=".292"
-             value="{{ data.avg or '' }}" style="width: 80px;">
+        <div class="counter-row">
+            <span style="width:50px;">投手:</span>
+            <select id="pitcher_select" style="flex:1; font-size:1.1rem;">
+                <option value="">(請先選擇球隊)</option>
+            </select>
+        </div>
+        <div class="counter-row">
+            <span style="width:50px;">NP:</span>
+            <button class="btn-gray" onclick="adj('np', -1)">-</button>
+            <span class="counter-val" id="disp_np" style="font-size:1.2rem; width:50px;">0</span>
+            <button class="btn-gray" onclick="adj('np', 1)">+</button>
+        </div>
+        <hr style="border-color:#444;">
+        <div class="counter-row">
+            <span style="width:50px;">打者:</span>
+            <select id="batter_select" style="flex:1; font-size:1.1rem;">
+                <option value="">(請先從名單設定)</option>
+            </select>
+        </div>
+        <div class="counter-row">
+            <select id="pa_result" style="flex:1;">
+                <option value="">-- 打席結果 --</option>
+                <option value="1B">一安 (1B)</option>
+                <option value="2B">二安 (2B)</option>
+                <option value="3B">三安 (3B)</option>
+                <option value="HR">全壘打 (HR)</option>
+                <option value="BB">保送 (BB)</option>
+                <option value="K">三振 (K)</option>
+                <option value="FO">飛球 (FO)</option>
+                <option value="GO">滾地 (GO)</option>
+                <option value="E">失誤 (E)</option>
+            </select>
+            <button class="btn-green" onclick="addPA()">紀錄</button>
+        </div>
+        <div style="background:#222; padding:5px; font-size:0.85rem; color:#aaa; border-radius:4px; min-height:20px;" id="pa_history">
+            (暫無打席紀錄)
+        </div>
     </div>
-  </div>
 
-  <!-- =================== 中間兩塊：左右並排 =================== -->
-  <div class="panel-row">
-    <!-- 分數 / 用球數 -->
-    <div class="control-group">
-      <h3>分數與用球數</h3>
-      <div class="control-group-row">
-        <label>客隊分數:</label>
-        <button type="button" class="counter-btn" data-key="away_score" data-op="-">-</button>
-        <span class="current-value" id="away_score_val">{{ data.away_score or 0 }}</span>
-        <button type="button" class="counter-btn" data-key="away_score" data-op="+">+</button>
-      </div>
-      <div class="control-group-row">
-        <label>主隊分數:</label>
-        <button type="button" class="counter-btn" data-key="home_score" data-op="-">-</button>
-        <span class="current-value" id="home_score_val">{{ data.home_score or 0 }}</span>
-        <button type="button" class="counter-btn" data-key="home_score" data-op="+">+</button>
-      </div>
-      <div class="control-group-row">
-        <label>投球數:</label>
-        <button type="button" class="counter-btn" data-key="np" data-op="-">-</button>
-        <input type="number" class="current-value"
-               id="np_val"
-               value="{{ data.np or 0 }}"
-               min="0"
-               style="width: 60px; text-align: center;">
-        <button type="button" class="counter-btn" data-key="np" data-op="+">+</button>
-      </div>
+    <div class="section-card" style="text-align:center;">
+        <div class="section-title">⏱️ 比賽計時器</div>
+        
+        <div class="timer-display-admin" id="admin_timer_display">02:30:00</div>
+        
+        <div style="margin-bottom:10px;">
+            設定時間: 
+            <input type="number" id="timer_h" value="2" style="width:40px; text-align:center;"> 時
+            <input type="number" id="timer_m" value="30" style="width:40px; text-align:center;"> 分
+            <button class="btn-gray" onclick="resetTimer()">重置</button>
+        </div>
+
+        <div class="timer-controls">
+            <button class="btn-green" onclick="startTimer()">▶ 開始</button>
+            <button class="btn-yellow" onclick="pauseTimer()">⏸ 暫停</button>
+        </div>
+        <div style="margin-top:10px; font-size:0.8rem; color:#888;">
+            * 倒數中會自動同步，剩15分變紅。
+        </div>
     </div>
 
-    <!-- 局數 / 好壞出局 -->
-    <div class="control-group">
-      <h3>局數與好壞出局數</h3>
-      <div class="control-group-row">
-        <label>局數:</label>
-        <input type="number" id="inning_num_input" min="1" max="99" value="1"
-               style="width: 50px; padding: 3px; text-align: center;">
-        <button type="button" class="counter-btn" id="inning_up">上</button>
-        <button type="button" class="counter-btn" id="inning_down">下</button>
-        <button type="button" class="counter-btn" id="inning_next">下一局</button>
-        <span class="current-value" id="inning_val" style="width: 60px;">{{ data.inning or '1上' }}</span>
-      </div>
-      <div class="control-group-row">
-        <label>壞球:</label>
-        <button type="button" class="counter-btn" data-key="balls" data-op="-">-</button>
-        <span class="current-value" id="balls_val">{{ data.balls or 0 }}</span>
-        <button type="button" class="counter-btn" data-key="balls" data-op="+">+</button>
-        <button type="button" class="clear-btn" id="clear_balls_btn">清空</button>
-      </div>
-      <div class="control-group-row">
-        <label>好球:</label>
-        <button type="button" class="counter-btn" data-key="strikes" data-op="-">-</button>
-        <span class="current-value" id="strikes_val">{{ data.strikes or 0 }}</span>
-        <button type="button" class="counter-btn" data-key="strikes" data-op="+">+</button>
-        <button type="button" class="clear-btn" id="clear_strikes_btn">清空</button>
-      </div>
-      <div class="control-group-row">
-        <label>出局:</label>
-        <button type="button" class="counter-btn" data-key="outs" data-op="-">-</button>
-        <span class="current-value" id="outs_val">{{ data.outs or 0 }}</span>
-        <button type="button" class="counter-btn" data-key="outs" data-op="+">+</button>
-        <button type="button" class="clear-btn" id="clear_outs_btn">清空</button>
-      </div>
+    <div class="section-card" style="text-align:center;">
+        <div class="section-title">即時總分 (唯讀)</div>
+        <div class="team-input-row">
+            <input id="away_team_input" placeholder="客隊名稱" style="width:120px; text-align:center; font-weight:bold;" readonly>
+            <span style="margin:0 10px; color:#888;">vs</span>
+            <input id="home_team_input" placeholder="主隊名稱" style="width:120px; text-align:center; font-weight:bold;" readonly>
+        </div>
+        <div class="score-display">
+            <span style="color:#3498db" id="total_away">0</span>
+            <span style="color:#555; font-size:2rem;">-</span>
+            <span style="color:#27ae60" id="total_home">0</span>
+        </div>
+        <div style="display:flex; gap:5px;">
+            <input id="away_logo" class="logo-input" placeholder="客隊檔名">
+            <input id="home_logo" class="logo-input" placeholder="主隊檔名">
+        </div>
+        <div style="margin-top:10px; font-size:0.8rem; color:#888;">* 輸入檔名會自動補 /static/logos/</div>
     </div>
-  </div>
+</div>
 
-  <!-- =================== 壘包 =================== -->
-  <div class="control-group">
-    <h3>壘包狀況</h3>
-    <button type="button" class="base-button base-inactive" id="base_b1" data-index="0">一壘</button>
-    <button type="button" class="base-button base-inactive" id="base_b2" data-index="1">二壘</button>
-    <button type="button" class="base-button base-inactive" id="base_b3" data-index="2">三壘</button>
-  </div>
-  
-  <!-- =================== 打席紀錄（只存在本控制台的記憶體） =================== -->
-  <div class="control-group">
-    <h3>打席紀錄（本控制台暫存）</h3>
-    <div class="control-group-row">
-      <label>本打席結果:</label>
-      <select id="pa_result_select" style="width: 130px;">
-        <option value="">選擇結果</option>
-        <option value="1B">1B</option>
-        <option value="2B">2B</option>
-        <option value="3B">3B</option>
-        <option value="HR">HR</option>
-        <option value="BB">BB</option>
-        <option value="HBP">HBP</option>
-        <option value="SF">SF</option>
-        <option value="SAC">SAC</option>
-        <option value="GO">GO</option>
-        <option value="AO">AO</option>
-        <option value="K">K</option>
-        <option value="DP">DP</option>
-        <option value="E">E</option>
-      </select>
-      <button type="button" id="record_pa_btn">記錄打席</button>
+<h2 style="text-align:center; margin-top:30px; color:#aaa; border-top:1px solid #444; padding-top:20px;">📋 詳細記分板 & 名單設定</h2>
+
+<div class="main-container">
+    <div class="section-card team-control-row team-away">
+        <h3 style="color:#3498db; margin-top:0;">客隊 (Away)</h3>
+        <select id="sel-away-db" onchange="applyTeamDB('away')" style="width:100%; margin-bottom:10px; background:#202b35; border-color:#3498db;">
+            <option value="">從資料庫載入球隊...</option>
+        </select>
+        <div class="rhe-ctrl">
+            <div class="rhe-item"><span>安打(H)</span><input type="number" id="away_H" value="0" style="width:50px; text-align:center;" min="0"></div>
+            <div class="rhe-item"><span>失誤(E)</span><input type="number" id="away_E" value="0" style="width:50px; text-align:center;" min="0"></div>
+        </div>
+        <div style="background:#222; padding:10px; border-radius:6px; margin-bottom:10px;">
+            <div class="box-grid">
+                <div class="box-header">1</div><div class="box-header">2</div><div class="box-header">3</div>
+                <div class="box-header">4</div><div class="box-header">5</div><div class="box-header">6</div>
+                <div class="box-header">7</div><div class="box-header">8</div><div class="box-header">9</div>
+            </div>
+            <div class="box-grid">
+                <script>for(let i=0; i<9; i++) document.write(`<div class="box-cell"><input type="number" class="score-inp-away" data-idx="${i}" value="0" min="0" onclick="this.select()" oninput="recalcTotal()"></div>`);</script>
+            </div>
+            <div style="text-align:right; margin-top:5px;"><button class="btn-yellow" style="font-size:0.8rem;" onclick="boxScoreAdj('away', 1)">目前局數得分 +1</button></div>
+        </div>
+        <button class="lineup-toggle" onclick="document.getElementById('lineup-away').classList.toggle('show')">設定 9 人名單 ▼</button>
+        <div id="lineup-away" class="lineup-area"></div>
     </div>
-    <div class="control-group-row">
-      <label>此打者前幾打席:</label>
-      <div id="pa_history_display"
-           style="font-size:0.85em; white-space:pre-line; max-width:100%;">
-        （目前沒有打席紀錄）
-      </div>
+
+    <div class="section-card team-control-row team-home">
+        <h3 style="color:#27ae60; margin-top:0;">主隊 (Home)</h3>
+        <select id="sel-home-db" onchange="applyTeamDB('home')" style="width:100%; margin-bottom:10px; background:#1e3324; border-color:#27ae60;">
+            <option value="">從資料庫載入球隊...</option>
+        </select>
+        <div class="rhe-ctrl">
+            <div class="rhe-item"><span>安打(H)</span><input type="number" id="home_H" value="0" style="width:50px; text-align:center;" min="0"></div>
+            <div class="rhe-item"><span>失誤(E)</span><input type="number" id="home_E" value="0" style="width:50px; text-align:center;" min="0"></div>
+        </div>
+        <div style="background:#222; padding:10px; border-radius:6px; margin-bottom:10px;">
+            <div class="box-grid">
+                <div class="box-header">1</div><div class="box-header">2</div><div class="box-header">3</div>
+                <div class="box-header">4</div><div class="box-header">5</div><div class="box-header">6</div>
+                <div class="box-header">7</div><div class="box-header">8</div><div class="box-header">9</div>
+            </div>
+            <div class="box-grid">
+                <script>for(let i=0; i<9; i++) document.write(`<div class="box-cell"><input type="number" class="score-inp-home" data-idx="${i}" value="0" min="0" onclick="this.select()" oninput="recalcTotal()"></div>`);</script>
+            </div>
+            <div style="text-align:right; margin-top:5px;"><button class="btn-yellow" style="font-size:0.8rem;" onclick="boxScoreAdj('home', 1)">目前局數得分 +1</button></div>
+        </div>
+        <button class="lineup-toggle" onclick="document.getElementById('lineup-home').classList.toggle('show')">設定 9 人名單 ▼</button>
+        <div id="lineup-home" class="lineup-area"></div>
     </div>
-  </div>
+</div>
 
+<div class="submit-bar">
+    <div style="color:#aaa; font-size:0.9rem; display:flex; align-items:center;">
+        <span id="cxn_light" class="status-light"></span>
+        <span id="cxn_text">未連線</span>
+    </div>
+    <div style="position:relative;">
+        <button class="submit-btn" onclick="broadcast()">🔴 廣播更新</button>
+        <div id="toast">✅ 更新已送出</div>
+    </div>
+    <div style="color:#555; font-size:0.8rem; position:absolute; right:20px;">Tips: Enter=送出 | 1,2,3=B,S,O | +/-=NP</div>
+</div>
 
-  <!-- 隱藏欄位 -->
-  <input type="hidden" name="bases" id="bases_hidden" value="{{ data.bases | join(',') }}">
-  <input type="hidden" name="away_score" id="away_score_hidden" value="{{ data.away_score or 0 }}">
-  <input type="hidden" name="home_score" id="home_score_hidden" value="{{ data.home_score or 0 }}">
-  <input type="hidden" name="np" id="np_hidden" value="{{ data.np or 0 }}">
-  <input type="hidden" name="balls" id="balls_hidden" value="{{ data.balls or 0 }}">
-  <input type="hidden" name="strikes" id="strikes_hidden" value="{{ data.strikes or 0 }}">
-  <input type="hidden" name="outs" id="outs_hidden" value="{{ data.outs or 0 }}">
-  <input type="hidden" name="inning" id="inning_hidden" value="{{ data.inning or '1上' }}">
-  
-  <button type="submit" class="submit-btn">廣播更新</button>
-</form>
-<div id="toast">更新成功</div>
+<!-- ================= 資料注入區 ================= -->
+<script id="data-db" type="application/json">
+{{ players_by_team | tojson }}
+</script>
+
+<script id="data-state" type="application/json">
+{{ data | tojson }}
+</script>
+
 <script>
-// ================== 後端資料 & DOM 取得 ==================
-const PLAYERS_BY_TEAM = {{ players_by_team | tojson }};
-const initialData = {{ data | tojson }};
-
-const awayTeamSelect = document.getElementById('away_team_select');
-const homeTeamSelect = document.getElementById('home_team_select');
-const awayTeamInput  = document.getElementById('away_team_input');
-const homeTeamInput  = document.getElementById('home_team_input');
-
-const pitcherSelect = document.getElementById('pitcher_select');
-const batterSelect  = document.getElementById('batter_select');
-const pitcherInput  = document.getElementById('pitcher_input');
-const batterInput   = document.getElementById('batter_input');
-
-// ------------------ 局數解析 ------------------
-function getInningParts(inningStr) {
-    const match = String(inningStr || '').match(/(\d+)(上|下)/);
-    if (!match) return { num: 1, half: '上' };
-    return { num: parseInt(match[1]), half: match[2] };
+// ================= 1. 初始化 =================
+function loadJSONData(id, defaultVal) {
+    const el = document.getElementById(id);
+    if (!el) return defaultVal;
+    const text = el.textContent.trim();
+    if (text === '' || text.startsWith('{' + '{')) {
+        console.log(`[Admin] Using Mock Data for ${id} (Preview Mode)`);
+        return defaultVal;
+    }
+    try { return JSON.parse(text); } 
+    catch (e) { console.error(`[Admin] Parse error for ${id}:`, e); return defaultVal; }
 }
 
-// ------------------ 狀態物件 ------------------
-const state = {
-    away_score: parseInt(document.getElementById('away_score_hidden').value) || 0,
-    home_score: parseInt(document.getElementById('home_score_hidden').value) || 0,
-    np:         parseInt(document.getElementById('np_hidden').value) || 0,
-    balls:      parseInt(document.getElementById('balls_hidden').value) || 0,
-    strikes:    parseInt(document.getElementById('strikes_hidden').value) || 0,
-    outs:       parseInt(document.getElementById('outs_hidden').value) || 0,
-    inning:     document.getElementById('inning_hidden').value || (initialData.inning || '1上')
+const MOCK_DB = { "範例隊": ["[1] 投手", "[2] 打者"] };
+const MOCK_STATE = {
+    inning: "1上", balls: 0, strikes: 0, outs: 0, bases: [false, false, false], np: 0,
+    away_team: "客隊", home_team: "主隊", away_score: 0, home_score: 0,
+    batter_pa_recent: [],
+    box_away: { name: "客隊", scores: [0]*9, H:0, E:0, lineup: [] },
+    box_home: { name: "主隊", scores: [0]*9, H:0, E:0, lineup: [] },
+    timer_str: "02:30:00", timer_alert: false
 };
 
-const clamp = (v, max) => Math.max(0, Math.min(max, v));
-state.balls   = clamp(state.balls,   3);
-state.strikes = clamp(state.strikes, 2);
-state.outs    = clamp(state.outs,    2);
+const DB = loadJSONData('data-db', MOCK_DB);
+let state = loadJSONData('data-state', MOCK_STATE);
 
-// ------------------ 打席紀錄（前端暫存） ------------------
-const batterLogs = {};
-
-// ------------------ 投球數輸入框 ------------------
-const npInput = document.getElementById('np_val');
-if (npInput) {
-    npInput.addEventListener('input', () => {
-        let v = parseInt(npInput.value, 10);
-        if (isNaN(v) || v < 0) v = 0;
-        state.np = v;
-        document.getElementById('np_hidden').value = v;
-    });
+// 兼容：DB 內可能是字串，也可能是 {num, name}
+function getPlayerName(p) {
+    return (typeof p === 'string') ? p : (p.name || '');
 }
 
-// ------------------ 壘包狀態 ------------------
-const baseState = document.getElementById('bases_hidden').value.split(',')
-    .map(v => v.trim().toLowerCase() === 'true');
-const baseButtons = [
-    document.getElementById('base_b1'),
-    document.getElementById('base_b2'),
-    document.getElementById('base_b3')
-];
-const basesHiddenInput = document.getElementById('bases_hidden');
-
-// ------------------ 打席紀錄輸入區事件 ------------------
-const paResultSelect = document.getElementById('pa_result_select');
-const recordPaBtn    = document.getElementById('record_pa_btn');
-
-if (recordPaBtn && paResultSelect) {
-    recordPaBtn.addEventListener('click', () => {
-        const val = paResultSelect.value;
-        if (!val) return;  // 沒選結果就不記
-
-        appendBatterPA(val);   // 寫入前端暫存 + 更新「此打者前幾打席」
-        paResultSelect.value = '';  // 記錄完把選單清空
-    });
+function getPlayerNum(p) {
+    if (typeof p === 'string') return '';
+    return p.num || p.number || '';
 }
 
+// 初始化局數狀態
+if(!state.inning) state.inning = "1上";
+state.inn_num = parseInt(state.inning) || 1;
+state.inn_half = state.inning.includes("下") ? "下" : "上";
 
-// ------------------ 共用輔助函數 ------------------
-
-// 把使用者輸入的 LOGO 欄位（可能是檔名或完整 URL）轉成真正要送出的 URL
-function buildLogoUrl(raw) {
-    const v = (raw || '').trim();
-    if (!v) return '';
-
-    // 如果本來就打 http(s) 或以 / 開頭，就當成完整 URL 直接用
-    if (/^https?:\/\//i.test(v) || v.startsWith('/')) {
-        return v;
-    }
-
-    // 否則當成檔名，自動補上 Flask static 路徑
-    // 這裡假設 logo 放在 static/logos 底下，可以依你的實際路徑調整
-    return `/static/logos/${v}`;
-}
-
-function updateDisplay(key) {
-    const displayEl = document.getElementById(`${key}_val`);
-    const hiddenEl  = document.getElementById(`${key}_hidden`);
-
-    if (displayEl) {
-        if (displayEl.tagName === 'INPUT') {
-            displayEl.value = state[key];
-        } else {
-            displayEl.textContent = state[key];
-        }
-    }
-    if (hiddenEl) hiddenEl.value = state[key];
-}
-
-function updateBaseDisplay(index) {
-    const button = baseButtons[index];
-    const isActive = baseState[index];
-    button.classList.toggle('base-active', isActive);
-    button.classList.toggle('base-inactive', !isActive);
-    const baseName = button.textContent.split(' ')[0];
-    button.textContent = isActive ? baseName + ' (有)' : baseName;
-    basesHiddenInput.value = baseState.join(',');
-}
-
-// ------------------ Toast 提示 ------------------
-let toastTimer = null;
-function showToast(message = '更新成功') {
-    const toast = document.getElementById('toast');
-    if (!toast) return;
-
-    toast.textContent = message;
-    toast.classList.add('show');
-
-    // 重設計時器，幾秒後關閉
-    if (toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);  // 3 秒後消失
-}
-
-
-function handleCounter(key, op, max = Infinity, min = 0, wrap = false) {
-    const current = state[key] ?? 0;
-
-    if (op === '+') {
-        if (wrap && current >= max) {
-            // 到上限再按 + 就從 min（這裡都是 0）開始
-            state[key] = min;
-        } else {
-            state[key] = Math.min(max, current + 1);
-        }
-    } else if (op === '-') {
-        state[key] = Math.max(min, current - 1);
-    }
-
-    updateDisplay(key);
-}
-
-
-// 取得目前打者的名字（優先用 input，再用 select）
-function getCurrentBatterName() {
-    return (batterInput.value || batterSelect.value || '').trim();
-}
-
-// 把某個打者的紀錄渲染到畫面上的 pa_history_display
-function renderBatterHistory(batterName) {
-    const el = document.getElementById('pa_history_display');
-    if (!el) return;
-
-    batterName = batterName || getCurrentBatterName();
-    const list = batterLogs[batterName] || [];
-
-    if (list.length === 0) {
-        el.textContent = '（目前沒有打席紀錄）';
-        return;
-    }
-
-    // 只顯示最近 5 次打席
-    const lastN = list.slice(-5);
-    const lines = lastN.map(item => {
-        return `第 ${item.pa} 打席（${item.inning}）：${item.result}`;
-    });
-
-    el.textContent = lines.join('\n');
-}
-
-// 實際新增一筆打席紀錄
-function appendBatterPA(resultText) {
-    const batterName = getCurrentBatterName();
-    if (!batterName) return;  // 沒選打者就不記
-
-    if (!batterLogs[batterName]) {
-        batterLogs[batterName] = [];
-    }
-    const paList = batterLogs[batterName];
-
-    const newItem = {
-        pa: paList.length + 1,
-        inning: state.inning || '1上',
-        result: resultText.trim()
-    };
-    paList.push(newItem);
-
-    renderBatterHistory(batterName);
-}
-
-
-// ------------------ 填入球員名單 ------------------
-function fillPlayersForTeam(teamCode, selectEl, currentValue = null) {
-    selectEl.innerHTML = '';
-    const players = PLAYERS_BY_TEAM[teamCode] || [];
-
-    if (players.length === 0 && currentValue) {
-        const opt = document.createElement('option');
-        opt.value = currentValue;
-        opt.textContent = currentValue;
-        selectEl.appendChild(opt);
-        return;
-    }
-
-    players.forEach(name => {
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
-        if (currentValue && currentValue === name) {
-            opt.selected = true;
-        }
-        selectEl.appendChild(opt);
-    });
-}
-
-function syncTeamInputsFromSelect() {
-    awayTeamInput.value = awayTeamSelect.value;
-    homeTeamInput.value = homeTeamSelect.value;
-}
-
-// 根據目前局數（上 / 下）決定投手、打者使用哪一隊名單
-function updatePlayersByInning() {
-    const inningStr = state.inning || initialData.inning || '1上';
-    const { half } = getInningParts(inningStr);
-
-    const currentPitcher = pitcherInput.value || initialData.pitcher || '';
-    const currentBatter  = batterInput.value  || initialData.batter  || '';
-
-    if (half === '上') {
-        // 上半局：投手＝主隊，打者＝客隊
-        fillPlayersForTeam(homeTeamSelect.value, pitcherSelect, currentPitcher);
-        fillPlayersForTeam(awayTeamSelect.value, batterSelect,  currentBatter);
-    } else {
-        // 下半局：投手＝客隊，打者＝主隊
-        fillPlayersForTeam(awayTeamSelect.value, pitcherSelect, currentPitcher);
-        fillPlayersForTeam(homeTeamSelect.value, batterSelect,  currentBatter);
-    }
-
-    pitcherInput.value = pitcherSelect.value || '';
-    batterInput.value  = batterSelect.value  || '';
-}
-
-// 初始化隊伍 & 球員
-function initTeamAndPlayers() {
-    syncTeamInputsFromSelect();
-    updatePlayersByInning();
-    // 初始化時顯示目前打者的打席紀錄（如果有的話）
-    renderBatterHistory(getCurrentBatterName());
-}
-
-// 隊伍選單變更 → 重新依局數套用名單
-awayTeamSelect.addEventListener('change', () => {
-    syncTeamInputsFromSelect();
-    updatePlayersByInning();
-});
-homeTeamSelect.addEventListener('change', () => {
-    syncTeamInputsFromSelect();
-    updatePlayersByInning();
-});
-
-// 選球員時，同步隱藏欄位
-pitcherSelect.addEventListener('change', () => {
-    pitcherInput.value = pitcherSelect.value || '';
-});
-batterSelect.addEventListener('change', () => {
-    batterInput.value = batterSelect.value || '';
-
-    // 切換打者時，更新右邊的「前幾打席」
-    renderBatterHistory(batterInput.value.trim());
-
-    // 如果有打席結果下拉選單，就順便清空
-    const paResultSelect = document.getElementById('pa_result_select');
-    if (paResultSelect) {
-        paResultSelect.value = '';
-    }
-});
-
-// ------------------ 局數顯示 & 操作 ------------------
-function updateInningDisplay() {
-    const inningVal = document.getElementById('inning_val');
-    const inningHidden = document.getElementById('inning_hidden');
-    if (inningVal)   inningVal.textContent = state.inning;
-    if (inningHidden) inningHidden.value   = state.inning;
-
-    const { num } = getInningParts(state.inning);
-    const numInput = document.getElementById('inning_num_input');
-    if (numInput) numInput.value = num;
-
-    // 每次局數變化，更新投手 / 打者名單
-    updatePlayersByInning();
-}
-
-function updateInningFromInput() {
-    const numInput = document.getElementById('inning_num_input');
-    const num = parseInt(numInput.value) || 1;
-    const { half } = getInningParts(state.inning);
-    state.inning = `${num}${half}`;
-    updateInningDisplay();
-}
-
-document.getElementById('inning_num_input').addEventListener('change', updateInningFromInput);
-document.getElementById('inning_num_input').addEventListener('input', updateInningFromInput);
-
-document.getElementById('inning_up').onclick = () => {
-    const numInput = document.getElementById('inning_num_input');
-    const num = parseInt(numInput.value) || 1;
-    state.inning = `${num}上`;
-    updateInningDisplay();
-};
-document.getElementById('inning_down').onclick = () => {
-    const numInput = document.getElementById('inning_num_input');
-    const num = parseInt(numInput.value) || 1;
-    state.inning = `${num}下`;
-    updateInningDisplay();
-};
-document.getElementById('inning_next').onclick = () => {
-    let { num, half } = getInningParts(state.inning);
-    if (half === '上') {
-        state.inning = `${num}下`;
-    } else {
-        num += 1;
-        state.inning = `${num}上`;
-    }
-    updateInningDisplay();
-};
-
-// ------------------ 清空球數 / 出局 ------------------
-document.getElementById('clear_balls_btn').onclick = () => {
-    state.balls = 0;
-    updateDisplay('balls');
-};
-document.getElementById('clear_strikes_btn').onclick = () => {
-    state.strikes = 0;
-    updateDisplay('strikes');
-};
-document.getElementById('clear_outs_btn').onclick = () => {
-    state.outs = 0;
-    updateDisplay('outs');
-};
-
-// ------------------ 初始化畫面 ------------------
-Object.keys(state).forEach(key => {
-    if (key !== 'inning') updateDisplay(key);
-});
-updateInningDisplay();
-baseState.forEach((_, index) => updateBaseDisplay(index));
-
-// 綁定計數按鈕（含壞球 / 好球 / 出局上限＋循環）
-document.querySelectorAll('.counter-btn').forEach(button => {
-    const key = button.getAttribute('data-key');
-    const op = button.getAttribute('data-op');
-
-    if (!key) return;
-
-    button.onclick = () => {
-        let max = Infinity;
-        let wrap = false;
-
-        if (key === 'balls') {
-            max = 3;
-            wrap = (op === '+');  // 壞球 + 才循環
-        } else if (key === 'strikes') {
-            max = 2;
-            wrap = (op === '+');  // 好球 + 才循環
-        } else if (key === 'outs') {
-            max = 2;
-            wrap = (op === '+');  // 出局 + 才循環
-        }
-
-        handleCounter(key, op, max, 0, wrap);
-    };
-});
-
-
-// ------------------ 鍵盤快捷鍵 ------------------
-// 投球數 - / +、壞球 +、好球 +、出局 +、廣播更新
-document.addEventListener('keydown', (e) => {
-    const tag = e.target.tagName;
-    const isTyping =
-        tag === 'INPUT' ||
-        tag === 'TEXTAREA' ||
-        tag === 'SELECT' ||
-        e.target.isContentEditable;
-
-    // 如果正在輸入欄位打字，就不要吃快捷鍵，避免干擾輸入
-    if (isTyping) return;
-
-    switch (e.key) {
-        // 投球數 - （- 鍵）
-        case '-':
-            handleCounter('np', '-', Infinity, 0, false);
-            e.preventDefault();
-            break;
-
-        // 投球數 + （= 或 Shift + = 變成 +）
-        case '+':
-        case '=':
-            handleCounter('np', '+', Infinity, 0, false);
-            e.preventDefault();
-            break;
-
-        // 壞球 + （B / b）
-        case '1':
-            handleCounter('balls', '+', 3, 0, true);
-            e.preventDefault();
-            break;
-
-        // 好球 + （S / s）
-        case '2':
-            handleCounter('strikes', '+', 2, 0, true);
-            e.preventDefault();
-            break;
-
-        // 出局 + （O / o）
-        case '3':
-            handleCounter('outs', '+', 2, 0, true);
-            e.preventDefault();
-            break;
-
-        // 廣播更新（Enter）
-        case 'Enter': {
-            const form = document.getElementById('control');
-            if (form) {
-                // 盡量用 requestSubmit，比較符合標準
-                if (typeof form.requestSubmit === 'function') {
-                    form.requestSubmit();
-                } else {
-                    form.submit();
-                }
-                e.preventDefault();
-            }
-            break;
-        }
-    }
-});
-
-
-// 壘包按鈕
-baseButtons.forEach((button, index) => {
-    button.onclick = () => {
-        baseState[index] = !baseState[index];
-        updateBaseDisplay(index);
-    };
-});
-
-// ------------------ Socket / 廣播 ------------------
 const socket = io();
 
-document.getElementById('control').onsubmit = e => {
-    e.preventDefault();
-    const form = new FormData(e.target);
-    const data = Object.fromEntries(form.entries());
-    
-    data.away_score = state.away_score;
-    data.home_score = state.home_score;
-    data.np         = state.np;
-    data.balls      = state.balls;
-    data.strikes    = state.strikes;
-    data.outs       = state.outs;
-    data.inning     = state.inning;
-    data.bases      = baseState;
+// ===== DOM Elements =====
+const elPitcherSelect = document.getElementById('pitcher_select');
+const elBatterSelect  = document.getElementById('batter_select');
+const elAwayDB = document.getElementById('sel-away-db');
+const elHomeDB = document.getElementById('sel-home-db');
 
-    data.away_logo_url = buildLogoUrl(
-        document.getElementById('away_logo_url_input').value
-    );
-    data.home_logo_url = buildLogoUrl(
-        document.getElementById('home_logo_url_input').value
-    );
+const elDispBalls = document.getElementById('disp_balls');
+const elDispStrikes = document.getElementById('disp_strikes');
+const elDispOuts = document.getElementById('disp_outs');
+const elBase1 = document.getElementById('base1');
+const elBase2 = document.getElementById('base2');
+const elBase3 = document.getElementById('base3');
+const elDispNP = document.getElementById('disp_np');
 
-    // ⭐⭐ 關鍵：用「目前 select 選到的打者」，並且無論有沒有紀錄都送出一個陣列
-    const currentBatter =
-        (batterSelect && batterSelect.value
-            ? batterSelect.value
-            : (batterInput.value || '')
-        ).trim();
+const elDispInnNum = document.getElementById('disp_inn_num');
+const elBtnInnHalf = document.getElementById('btn_inn_half');
 
-    let logs = [];
-    if (typeof batterLogs !== 'undefined' && currentBatter) {
-        logs = batterLogs[currentBatter] || [];
+const elAwayTeamInp = document.getElementById('away_team_input');
+const elHomeTeamInp = document.getElementById('home_team_input');
+const elAwayLogoInp = document.getElementById('away_logo');
+const elHomeLogoInp = document.getElementById('home_logo');
+const elTotalAway = document.getElementById('total_away');
+const elTotalHome = document.getElementById('total_home');
+const elAdminTimerDisplay = document.getElementById('admin_timer_display');
+const elToast = document.getElementById('toast');
+
+// Timer
+let timerInterval = null;
+let totalSeconds = 2 * 3600 + 30 * 60; 
+let isRunning = false;
+
+// ================= 2. UI Init =================
+function initLineupHTML(side) {
+    const container = document.getElementById(`lineup-${side}`);
+    const selDB = document.getElementById(`sel-${side}-db`);
+    if(DB) Object.keys(DB).forEach(team => selDB.innerHTML += `<option value="${team}">${team}</option>`);
+    let html = '';
+    for(let i=1; i<=9; i++) {
+        // 加入 onchange 觸發打者選單更新
+        html += `<div class="lineup-row"><div class="lineup-num">${i}.</div><select id="lineup-${side}-${i-1}" style="flex:1; font-size:0.9rem;" onchange="updatePitcherBatterLists()"><option value="(待定)">(待定)</option></select></div>`;
     }
-    console.log('submit batter =', currentBatter, 'logs =', logs);
-    // 永遠送出最近幾次（即使是 []），讓前端知道要清空
-    data.batter_pa_recent = logs.slice(-5);
+    container.innerHTML = html;
+}
+initLineupHTML('away');
+initLineupHTML('home');
 
-    Object.keys(data).forEach(key => {
-        if (typeof data[key] === 'string' && data[key].trim() === '') {
-            delete data[key];
-        }
-    });
+// ================= 3. Socket Events =================
+socket.on('connect', () => {
+    document.getElementById('cxn_light').classList.add('status-connected');
+    document.getElementById('cxn_text').innerText = "伺服器已連線";
+    document.getElementById('cxn_text').style.color = "#ddd";
+});
 
-    socket.emit('update', data);
-    showToast('更新成功');
-};
+socket.on('disconnect', () => {
+    document.getElementById('cxn_light').classList.remove('status-connected');
+    document.getElementById('cxn_text').innerText = "斷線重連中...";
+    document.getElementById('cxn_text').style.color = "red";
+});
 
-// Socket 接收 → 多控制台同步
-socket.on('update', data => {
-    Object.keys(state).forEach(key => {
-        if (data[key] !== undefined) {
-            if (key === 'balls') {
-                state[key] = clamp(Number(data[key]) || 0, 3);
-            } else if (key === 'strikes') {
-                state[key] = clamp(Number(data[key]) || 0, 2);
-            } else if (key === 'outs') {
-                state[key] = clamp(Number(data[key]) || 0, 2);
-            } else if (key === 'np' || key.endsWith('_score')) {
-                state[key] = Number(data[key]) || 0;
-            } else if (key === 'inning') {
-                state[key] = String(data[key]);
-            }
-            if (key !== 'inning') updateDisplay(key);
-        }
-    });
+socket.on('update', (data) => {
+    if(data.np !== undefined) state.np = data.np;
+    if(data.timer_str) elAdminTimerDisplay.innerText = data.timer_str;
+});
 
-    if (data.inning !== undefined) {
-        state.inning = String(data.inning);
-        updateInningDisplay();
+socket.on("player_stats", (data) => {
+    console.log("[Admin] recv player_stats:", data);
+    const pName = data.pitcher;
+    const bName = data.batter;
+
+    // 投手 NP
+    if (pName && pName === elPitcherSelect.value) {
+        state.pitcher = pName;
+        state.np = data.np || 0;
     }
 
-    if (data.bases) {
-        data.bases.forEach((isActive, index) => {
-            baseState[index] = !!isActive;
-            updateBaseDisplay(index);
+    // 打者打席紀錄
+    if (bName && bName === elBatterSelect.value) {
+        state.batter = bName;
+        state.batter_pa_recent = Array.isArray(data.batter_pa_recent)
+            ? data.batter_pa_recent
+            : [];
+    }
+
+    renderAll();
+});
+
+// ================= 4. Logic =================
+
+// 切換選單
+elPitcherSelect.addEventListener('change', () => { state.pitcher = elPitcherSelect.value; requestPlayerStats(); });
+elBatterSelect.addEventListener('change', () => { state.batter = elBatterSelect.value; requestPlayerStats(); });
+
+function requestPlayerStats() {
+    const p = elPitcherSelect.value || "";
+    const b = elBatterSelect.value || "";
+    if (!p && !b) return;
+    // ⭐ 不要再清空打席紀錄，讓目前這場比賽的紀錄留在前端
+    socket.emit("get_player_stats", { pitcher: p, batter: b });
+}
+
+
+// ================= 5. Render =================
+function renderBSO() {
+    elDispBalls.innerText   = state.balls;
+    elDispStrikes.innerText = state.strikes;
+    elDispOuts.innerText    = state.outs;
+    elBase1.checked = !!(state.bases && state.bases[0]);
+    elBase2.checked = !!(state.bases && state.bases[1]);
+    elBase3.checked = !!(state.bases && state.bases[2]);
+    elDispNP.innerText = state.np;
+}
+
+function renderGameInfo() {
+    elDispInnNum.innerText = state.inn_num;
+    elBtnInnHalf.innerText = state.inn_half;
+    // 局數顯示文字
+    const innStr = `${state.inn_num}${state.inn_half}`;
+    state.inning = innStr;
+}
+
+function renderTeams() {
+    elAwayTeamInp.value = state.away_team || '';
+    elHomeTeamInp.value = state.home_team || '';
+    elAwayLogoInp.value = state.away_logo_url || '';
+    elHomeLogoInp.value = state.home_logo_url || '';
+}
+
+function renderTotals() {
+    elTotalAway.innerText = state.away_score ?? 0;
+    elTotalHome.innerText = state.home_score ?? 0;
+}
+
+function renderAll() {
+    renderBSO();
+    renderGameInfo();
+    renderTeams();
+    renderTotals();
+    renderTeamBox('away');
+    renderTeamBox('home');
+    renderPAHistory();
+}
+
+function renderTeamBox(side) {
+    const box = state[`box_${side}`];
+    if(!box) return;
+    document.getElementById(`${side}_H`).value = box.H;
+    document.getElementById(`${side}_E`).value = box.E;
+    box.scores.forEach((s, idx) => {
+        const el = document.querySelector(`.score-inp-${side}[data-idx="${idx}"]`);
+        if(el) el.value = s;
+    });
+}
+
+function renderPAHistory() {
+    const container = document.getElementById('pa_history');
+    const list = state.batter_pa_recent || [];
+    if (!container) return;
+    if (list.length === 0) { container.innerHTML = '<span style="color:#666;">(暫無紀錄)</span>'; return; }
+    container.innerHTML = list.map(item => `<div><span style="color:#f1c40f;">[${item.inning}]</span> ${item.result}</div>`).join("");
+}
+
+// ================= 6. Timer =================
+function updateTimerDisplay() {
+    let h = Math.floor(totalSeconds / 3600);
+    let m = Math.floor((totalSeconds % 3600) / 60);
+    let s = totalSeconds % 60;
+    let str = (h<10?"0"+h:h)+":"+(m<10?"0"+m:m)+":"+(s<10?"0"+s:s);
+    elAdminTimerDisplay.innerText = str;
+    const isAlert = totalSeconds <= 900;
+    elAdminTimerDisplay.classList.toggle('timer-alert-mode', isAlert);
+    socket.emit('update', { timer_str: str, timer_alert: isAlert });
+}
+function startTimer() { if(isRunning) return; isRunning=true; timerInterval = setInterval(() => { if(totalSeconds>0){totalSeconds--;updateTimerDisplay();}else{pauseTimer();} }, 1000); }
+function pauseTimer() { isRunning=false; clearInterval(timerInterval); }
+function resetTimer() { pauseTimer(); totalSeconds = (parseInt(document.getElementById('timer_h').value)||0)*3600 + (parseInt(document.getElementById('timer_m').value)||0)*60; updateTimerDisplay(); }
+resetTimer();
+
+// ================= 7. Operations =================
+function buildLogoPath(raw) {
+    if (!raw) return "";
+    let val = raw.trim();
+    if (val.startsWith('/') || val.startsWith('http')) return val;
+    return `/static/logos/${val}`;
+}
+
+// 更新下拉選單
+// 更新投手 / 打者下拉選單
+function updatePitcherBatterLists() {
+    const inningStr = state.inning || "1上";
+    const isTop = inningStr.includes("上");
+
+    const awayTeamName = elAwayDB.value;   // 客隊名稱 (從 DB 選單)
+    const homeTeamName = elHomeDB.value;   // 主隊名稱
+
+    // 投手依照「守備方」球隊
+    const pitcherTeamName = isTop ? homeTeamName : awayTeamName;
+    // 打者依照「進攻方」的 9 人名單
+    const batterSide = isTop ? 'away' : 'home';   // 上：客隊打；下：主隊打
+
+    // ---- 投手：照舊，從整隊名單(DB)填 ----
+    const fillPitcherFromDB = (selectEl, teamName) => {
+        const currentVal = selectEl.value;
+        selectEl.innerHTML = '<option value="">--選擇--</option>';
+
+        const roster = DB[teamName] || [];
+        roster.forEach(p => {
+            const name = getPlayerName(p);      // 純名字
+            const num  = getPlayerNum(p);       // 背號(可能空)
+            const text = num ? `${num} ${name}` : name; // 顯示用文字
+
+            const opt = new Option(text, name); // ⭐ value 只放名字
+            selectEl.add(opt);
+        });
+
+        if ([...selectEl.options].some(o => o.value === currentVal)) {
+            selectEl.value = currentVal;
+        }
+    };
+
+    // ---- 打者：改成從該 side 的 9 人名單抓 ----
+    const fillBatterFromLineup = (selectEl, side) => {
+        const currentVal = selectEl.value;
+        selectEl.innerHTML = '<option value="">--選擇--</option>';
+
+        for (let i = 0; i < 9; i++) {
+            const lineupSel = document.getElementById(`lineup-${side}-${i}`);
+            if (!lineupSel) continue;
+
+            const nameVal = lineupSel.value;
+            if (!nameVal || nameVal === '(待定)') continue;
+
+            // 顯示文字沿用 lineup 的 option 文字 (會有背號)
+            const text = lineupSel.options[lineupSel.selectedIndex].text || nameVal;
+
+            const opt = new Option(text, nameVal);  // ⭐ value 仍然只放名字
+            selectEl.add(opt);
+        }
+
+        if ([...selectEl.options].some(o => o.value === currentVal)) {
+            selectEl.value = currentVal;
+        }
+    };
+
+    const savedPitcher = state.pitcher || elPitcherSelect.value;
+    const savedBatter  = state.batter  || elBatterSelect.value;
+
+    // 先重建選單
+    fillPitcherFromDB(elPitcherSelect, pitcherTeamName);
+    fillBatterFromLineup(elBatterSelect, batterSide);
+
+    // 儘量保留原本選取的名字
+    if (savedPitcher && [...elPitcherSelect.options].some(o => o.value === savedPitcher)) {
+        elPitcherSelect.value = savedPitcher;
+    }
+    if (savedBatter && [...elBatterSelect.options].some(o => o.value === savedBatter)) {
+        elBatterSelect.value = savedBatter;
+    }
+}
+
+
+function applyTeamDB(side) {
+    const teamName = document.getElementById(`sel-${side}-db`).value;
+    if (!teamName) return;
+
+    document.getElementById(`${side}_team_input`).value = teamName;
+    const players = DB[teamName] || [];
+
+    for (let i = 0; i < 9; i++) {
+        const sel = document.getElementById(`lineup-${side}-${i}`);
+        const oldVal = sel.value;
+        sel.innerHTML = '<option value="(待定)">(待定)</option>';
+
+        players.forEach(p => {
+            const name = getPlayerName(p);
+            const num  = getPlayerNum(p);
+            const text = num ? `${num} ${name}` : name;
+            const opt  = new Option(text, name); // ⭐ value = 名字
+            sel.add(opt);
+        });
+
+        // 盡量保留原本的名字選擇
+        if (players.some(p => getPlayerName(p) === oldVal)) {
+            sel.value = oldVal;
+        }
+    }
+
+    updatePitcherBatterLists(); // 讓投打下拉也同步
+}
+
+
+function adj(key, delta) {
+    if (delta === -99) state[key] = 0;
+    else state[key] = Math.max(0, (state[key] || 0) + delta);
+
+    if (key === 'balls' && state.balls > 3) state.balls = 0;
+    if (key === 'strikes' && state.strikes > 2) state.strikes = 0;
+    if (key === 'outs' && state.outs > 2) state.outs = 0;
+
+    // ⭐ NP：同步存到後端
+    if (key === 'np') {
+        const pitcherName = state.pitcher || elPitcherSelect.value || "";
+        if (pitcherName) {
+            socket.emit("save_pitcher_state", {
+                pitcher: pitcherName,
+                np: state.np
+            });
+        }
+    }
+
+    renderAll();
+}
+
+
+// 局數調整邏輯
+function adjInning(delta) {
+    let n = state.inn_num + delta;
+    if(n < 1) n = 1;
+    state.inn_num = n;
+    state.inning = `${state.inn_num}${state.inn_half}`;
+    updatePitcherBatterLists();
+    renderAll();
+}
+
+function toggleInningHalf() {
+    state.inn_half = (state.inn_half === "上") ? "下" : "上";
+    state.inning = `${state.inn_num}${state.inn_half}`;
+    updatePitcherBatterLists();
+    renderAll();
+}
+
+function boxScoreAdj(side, delta) {
+    const idx = state.inn_num - 1;
+    if(idx < 0 || idx > 8) { alert("只能調整 1~9 局"); return; }
+    const input = document.querySelector(`.score-inp-${side}[data-idx="${idx}"]`);
+    if(input) {
+        input.value = Math.max(0, (parseInt(input.value)||0) + delta);
+        recalcTotal();
+    }
+}
+function recalcTotal() {
+    let sumA = 0, sumH = 0;
+    document.querySelectorAll('.score-inp-away').forEach(el => sumA += (parseInt(el.value)||0));
+    document.querySelectorAll('.score-inp-home').forEach(el => sumH += (parseInt(el.value)||0));
+    elTotalAway.innerText = sumA;
+    elTotalHome.innerText = sumH;
+    state.away_score = sumA;
+    state.home_score = sumH;
+}
+function addPA() {
+    const res = document.getElementById('pa_result').value;
+    if (!res) return;
+
+    const item = { result: res, inning: state.inning };
+    if (!state.batter_pa_recent) state.batter_pa_recent = [];
+    state.batter_pa_recent.push(item);
+    if (state.batter_pa_recent.length > 5) state.batter_pa_recent.shift();
+
+    // BSO 自動處理
+    if (['K', 'FO', 'GO'].includes(res)) adj('outs', 1);
+    if (res === 'BB') adj('balls', 0);
+
+    // ⭐ 把這個打者的打席紀錄同步存到後端
+    const batterName = state.batter || elBatterSelect.value || "";
+    if (batterName) {
+        socket.emit("save_batter_state", {
+            batter: batterName,
+            batter_pa_recent: state.batter_pa_recent
         });
     }
+
+    document.getElementById('pa_result').value = "";
+    renderAll();
+}
+
+// ================= 8. Broadcast =================
+function broadcast() {
+    // 強制更新 state 的局數
+    state.inning = `${state.inn_num}${state.inn_half}`;
     
-    document.querySelector('input[name="away_team"]').value = data.away_team || '';
-    document.querySelector('input[name="home_team"]').value = data.home_team || '';
-    document.querySelector('input[name="pitcher"]').value   = data.pitcher || '';
-    document.querySelector('input[name="batter"]').value    = data.batter || '';
-    const avgInput = document.querySelector('input[name="avg"]');
-    if (avgInput) avgInput.value = data.avg || '';
-    document.getElementById('away_logo_url_input').value = data.away_logo_url || '';
-    document.getElementById('home_logo_url_input').value = data.home_logo_url || '';
+    state.pitcher = document.getElementById('pitcher_select').value;
+    state.batter = document.getElementById('batter_select').value;
+    state.away_team = document.getElementById('away_team_input').value;
+    state.home_team = document.getElementById('home_team_input').value;
+    
+    state.away_logo_url = buildLogoPath(document.getElementById('away_logo').value);
+    state.home_logo_url = buildLogoPath(document.getElementById('home_logo').value);
+    
+    state.bases = [
+        document.getElementById('base1').checked,
+        document.getElementById('base2').checked,
+        document.getElementById('base3').checked
+    ];
 
-    if (data.away_team !== undefined) awayTeamSelect.value = data.away_team;
-    if (data.home_team !== undefined) homeTeamSelect.value = data.home_team;
-    syncTeamInputsFromSelect();
+    state.box_away = collectBoxData('away');
+    state.box_home = collectBoxData('home');
+    state.away_score = state.box_away.scores.reduce((a,b)=>a+b, 0);
+    state.home_score = state.box_home.scores.reduce((a,b)=>a+b, 0);
 
-    updatePlayersByInning();
+    state.timer_str = document.getElementById('admin_timer_display').innerText;
+    state.timer_alert = document.getElementById('admin_timer_display').classList.contains('timer-alert-mode');
+
+    const payload = {
+        ...state,
+        bases: [...state.bases],
+        batter_pa_recent: [...state.batter_pa_recent]
+    };
+
+    console.log("[Admin] Broadcasting...", payload);
+    socket.emit('update', payload);
+
+    elToast.style.top = "-50px";
+    elToast.style.opacity = 1;
+    setTimeout(() => { elToast.style.opacity = 0; }, 1500);
+}
+
+function collectBoxData(side) {
+    const scores = [];
+    document.querySelectorAll(`.score-inp-${side}`).forEach(el => scores.push(parseInt(el.value) || 0));
+    const lineup = [];
+    for(let i=0; i<9; i++) {
+        const el = document.getElementById(`lineup-${side}-${i}`);
+        lineup.push(el ? el.value : "(待定)");
+    }
+    return {
+        name: document.getElementById(`${side}_team_input`).value,
+        scores: scores,
+        H: parseInt(document.getElementById(`${side}_H`).value) || 0,
+        E: parseInt(document.getElementById(`${side}_E`).value) || 0,
+        lineup: lineup
+    };
+}
+
+document.addEventListener('keydown', (e) => {
+    if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) return;
+    if(e.key === 'Enter') { broadcast(); e.preventDefault(); }
+    if(e.key === '1') adj('balls', 1);
+    if(e.key === '2') adj('strikes', 1);
+    if(e.key === '3') adj('outs', 1);
+    if(e.key === '+' || e.key === '=' || e.code === 'NumpadAdd') { adj('np', 1); e.preventDefault(); }
+    if(e.key === '-' || e.key === '_' || e.code === 'NumpadSubtract') { adj('np', -1); e.preventDefault(); }
 });
+
+renderAll();
+updatePitcherBatterLists();
 </script>
 </body>
 </html>

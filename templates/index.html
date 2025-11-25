@@ -319,11 +319,15 @@ body {
 <script>
 const socket = io();
 
+// 核心版本號，和 full_board 一樣概念
+let lastCoreVersion = {{ data.core_version or 0 }};
+
 // 追蹤上一次的分數
 let lastScores = {
     away_score: parseInt('{{ data.away_score }}') || 0,
     home_score: parseInt('{{ data.home_score }}') || 0
 };
+
 const FLASH_DURATION = 1500; 
 
 function flashScore(elementId, newScore, oldScore) {
@@ -357,6 +361,16 @@ function updateBases(basesArray) {
     });
 }
 
+function cleanName(raw) {
+    if (!raw) return '';
+    // 把前面像 "[10] " 或 "10 " 之類的背號切掉
+    return String(raw)
+        .replace(/^\s*\[[^\]]*]\s*/, '')   // 開頭是 [10] 這種
+        .replace(/^\s*\d+\s*/, '')         // 開頭是 10 空白 這種
+        .trim();
+}
+
+
 function formatInning(inningStr) {
     if (typeof inningStr === 'string') {
         return inningStr.replace('上', ' △').replace('下', ' ▽');
@@ -384,6 +398,16 @@ function updateTeamLogo(teamElementId, teamName, logoUrl) {
 socket.on('update', data => {
     console.log("update raw data =", data);
     
+    // 1. 先根據 core_version 判斷：有沒有「記分板內容」更新
+    const oldVersion = lastCoreVersion;
+    const newVersion = (data.core_version ?? oldVersion);
+
+    // 如果版本沒變，代表這次可能只是 timer 更新之類的，index 就直接忽略
+    if (newVersion === oldVersion) {
+        return;
+    }
+    lastCoreVersion = newVersion;
+    
     const mergedData = { 
         away_team: '客隊', home_team: '主隊', away_score: 0, home_score: 0,
         inning: '1上', pitcher: '投手', batter: '打者', np: 0,
@@ -407,10 +431,10 @@ socket.on('update', data => {
     // 3. 其他資訊
     document.getElementById('away_score').textContent = currentAwayScore;
     document.getElementById('home_score').textContent = currentHomeScore;
-    document.getElementById('pitcher_info').textContent = `P ${mergedData.pitcher}`;
+    document.getElementById('pitcher_info').textContent = `P ${cleanName(mergedData.pitcher)}`;    
     document.getElementById('np_info').textContent = `NP: ${mergedData.np}`;
     document.getElementById('inning').textContent = formatInning(mergedData.inning);
-    document.getElementById('batter_name').textContent = `H ${mergedData.batter}`;
+    document.getElementById('batter_name').textContent = `H ${cleanName(mergedData.batter)}`;    
     // 顯示目前打者最近幾次打席
     const paRecentDiv = document.getElementById('batter_pa_recent');
     if (paRecentDiv) {

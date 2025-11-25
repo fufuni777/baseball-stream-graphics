@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>比賽完整看板</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background-color: #222; color: white;
+            display: flex; flex-direction: column; align-items: center;
+            margin: 0; padding: 10px; height: 100vh; box-sizing: border-box;
+        }
+        
+        /* 記分板 */
+        .scoreboard-container {
+            width: 100%; max-width: 1600px;
+            background: #333; padding: 10px; border-radius: 10px;
+            margin-bottom: 20px; overflow-x: auto;
+            margin-top: 20px;
+        }
+        table { width: 100%; border-collapse: collapse; text-align: center; color: white; }
+        th, td { padding: 8px; border: 1px solid #555; font-size: 1.4rem; }
+        th { background: #111; color: #aaa; }
+        .team-name { font-size: 1.6rem; font-weight: 900; text-align: left; padding-left: 15px; background: #fff; color: #222; min-width: 150px;}
+        .score-num { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.8rem; width: 50px;}
+        
+        /* 亮燈樣式：橘底白字 */
+        .active-inning { background-color: #e67e22; color: white; box-shadow: inset 0 0 10px rgba(0,0,0,0.3); }
+        
+        .total-R { background: #f1c40f; color: black; font-weight: bold; }
+
+        /* 名單與計時器區 */
+        .lineup-section {
+            display: flex; 
+            width: 100%; 
+            max-width: 1600px; 
+            gap: 120px;  /* 【修改】從 60px 改為 120px，大幅拉大名單間距 */
+            flex: 1; 
+            overflow-y: hidden;
+            justify-content: space-between;
+        }
+        .team-list {
+            flex: 1; 
+            background: #2c3e50; 
+            border-radius: 10px; 
+            padding: 10px; 
+            border-top: 5px solid #ccc;
+            display: flex; 
+            flex-direction: column;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
+        }
+        .list-title { text-align: center; font-size: 1.6rem; font-weight: bold; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #555;}
+        .player-grid {
+            display: grid; grid-template-columns: 1fr; gap: 5px; overflow-y: auto;
+        }
+        .player-row {
+            display: flex; padding: 8px; border-bottom: 1px solid #3d566e; font-size: 1.3rem; align-items: center;
+        }
+        .p-order { width: 40px; color: #f1c40f; font-weight: bold; }
+        .p-name { flex: 1; text-align: left; font-weight: bold; letter-spacing: 1px;}
+
+        /* 中間計時器樣式 */
+        .timer-box {
+            width: 420px; /* 【修改】從 340px 改為 420px，黑色背景加寬 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            
+            background: linear-gradient(to bottom, #222, #000);
+            border: 3px solid #555;
+            border-radius: 20px; 
+            
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.8);
+            position: relative;
+        }
+        
+        /* 裝飾性螺絲孔 */
+        .timer-box::before, .timer-box::after {
+            content: ''; position: absolute; width: 8px; height: 8px; 
+            background: #333; border-radius: 50%; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8);
+        }
+        .timer-box::before { top: 10px; left: 10px; }
+        .timer-box::after { bottom: 10px; right: 10px; }
+
+        .timer-label { 
+            font-size: 1.2rem; 
+            color: #888; 
+            margin-bottom: 10px; 
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+            width: 80%;
+            text-align: center;
+        }
+        
+        .timer-val { 
+            font-family: 'Courier New', monospace; 
+            font-size: 4.5rem; 
+            font-weight: 900; 
+            color: #0f0; 
+            padding: 10px 20px;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.7); 
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+        
+        /* 警告模式 */
+        .timer-alert {
+            background: linear-gradient(to bottom, #a93226, #7b241c) !important;
+            border-color: #e74c3c !important;
+            animation: pulse-border 2s infinite;
+        }
+        .timer-alert .timer-val { 
+            color: #fff !important; 
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+        .timer-alert .timer-label { 
+            color: #fadbd8 !important; 
+            border-color: #e6b0aa;
+        }
+
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+    </style>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+
+    <div class="scoreboard-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 15%;">TEAM</th>
+                    <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th>
+                    <th>R</th><th>H</th><th>E</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="row-away"></tr>
+                <tr id="row-home"></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="lineup-section">
+        <div class="team-list" style="border-color: #3498db;">
+            <div class="list-title" id="title-away">客隊</div>
+            <div class="player-grid" id="list-away"></div>
+        </div>
+
+        <div class="timer-box" id="timer_container">
+            <div class="timer-label">Game Time</div>
+            <div class="timer-val" id="main_clock">02:30:00</div>
+        </div>
+
+        <div class="team-list" style="border-color: #27ae60;">
+            <div class="list-title" id="title-home">主隊</div>
+            <div class="player-grid" id="list-home"></div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+
+        // 預設空資料
+        const emptyBox = { name: "-", scores: [0,0,0,0,0,0,0,0,0], H: 0, E: 0, lineup: [] };
+
+        // 初始化核心版本號（初始 data 裡可能沒有就用 0）
+        let lastCoreVersion = {{ data.core_version or 0 }};
+
+        socket.on('update', (data) => {
+            // 1. 優先更新計時器
+            if (data.timer_str) {
+                const clock = document.getElementById('main_clock');
+                const box = document.getElementById('timer_container');
+                
+                clock.innerText = data.timer_str;
+                
+                if (data.timer_alert) {
+                    box.classList.add('timer-alert');
+                } else {
+                    box.classList.remove('timer-alert');
+                }
+            }
+
+            // 2. 檢查其他資料
+            const oldVersion = lastCoreVersion;
+            const newVersion = data.core_version ?? oldVersion;
+
+            // 核心版本沒變 → 代表沒有分數 / 名單 / 局數等變動，不用重繪表格與名單
+            if (newVersion === oldVersion) {
+                return;
+            }
+            lastCoreVersion = newVersion;
+
+            console.log("Fullboard core update, version =", newVersion);
+
+            // 3. 渲染表格與名單
+            const innStr = data.inning || "1上";
+            const innNum = parseInt(innStr); 
+            const isTop = innStr.includes("上"); 
+
+            renderRow('away', data.box_away || emptyBox, innNum, isTop);
+            renderRow('home', data.box_home || emptyBox, innNum, isTop);
+
+            renderLineup('away', data.box_away || emptyBox);
+            renderLineup('home', data.box_home || emptyBox);
+        });
+
+        function renderRow(side, d, innNum, isTop) {
+            const row = document.getElementById(`row-${side}`);
+            let html = `<td class="team-name">${d.name}</td>`;
+            
+            let total = 0;
+            const scores = d.scores || [0]*9;
+
+            for(let i=0; i<9; i++) {
+                const s = scores[i] || 0;
+                total += s;
+                
+                let isActive = false;
+                if ((i + 1) === innNum) {
+                    if (side === 'away' && isTop) isActive = true;
+                    if (side === 'home' && !isTop) isActive = true;
+                }
+
+                const cls = isActive ? 'score-num active-inning' : 'score-num';
+                html += `<td class="${cls}">${s}</td>`;
+            }
+            
+            html += `<td class="score-num total-R">${total}</td>`;
+            html += `<td class="score-num" style="background:#7f8c8d;">${d.H || 0}</td>`;
+            html += `<td class="score-num" style="background:#c0392b;">${d.E || 0}</td>`;
+            row.innerHTML = html;
+        }
+
+        function renderLineup(side, d) {
+            document.getElementById(`title-${side}`).innerText = d.name;
+            const box = document.getElementById(`list-${side}`);
+            box.innerHTML = '';
+            const arr = d.lineup || [];
+            
+            arr.forEach((name, i) => {
+                box.innerHTML += `
+                    <div class="player-row">
+                        <span class="p-order">${i+1}.</span>
+                        <span class="p-name">${name}</span>
+                    </div>
+                `;
+            });
+            
+            for(let j=arr.length; j<9; j++) {
+                 box.innerHTML += `
+                    <div class="player-row">
+                        <span class="p-order">${j+1}.</span>
+                        <span class="p-name">--</span>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
