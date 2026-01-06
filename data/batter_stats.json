@@ -1,0 +1,406 @@
+{
+  "張宗凱": {
+    "batter_pa_recent": [
+      {
+        "result": "BB",
+        "inning": "1上"
+      },
+      {
+        "result": "3B",
+        "inning": "2上"
+      },
+      {
+        "result": "BB",
+        "inning": "4上"
+      },
+      {
+        "result": "GO",
+        "inning": "5上"
+      }
+    ]
+  },
+  "許彥文": {
+    "batter_pa_recent": [
+      {
+        "result": "BB",
+        "inning": "1上"
+      },
+      {
+        "result": "E",
+        "inning": "2上"
+      },
+      {
+        "result": "1B",
+        "inning": "4上"
+      },
+      {
+        "result": "E",
+        "inning": "5上"
+      }
+    ]
+  },
+  "宋起泰": {
+    "batter_pa_recent": [
+      {
+        "result": "GO",
+        "inning": "1上"
+      },
+      {
+        "result": "2B",
+        "inning": "2上"
+      },
+      {
+        "result": "FO",
+        "inning": "4上"
+      },
+      {
+        "result": "1B",
+        "inning": "5上"
+      }
+    ]
+  },
+  "林昱諺": {
+    "batter_pa_recent": [
+      {
+        "result": "FO",
+        "inning": "1上"
+      },
+      {
+        "result": "K",
+        "inning": "2上"
+      },
+      {
+        "result": "GO",
+        "inning": "4上"
+      }
+    ]
+  },
+  "李柏廷": {
+    "batter_pa_recent": [
+      {
+        "result": "FO",
+        "inning": "1上"
+      },
+      {
+        "result": "FO",
+        "inning": "3上"
+      },
+      {
+        "result": "1B",
+        "inning": "4上"
+      },
+      {
+        "result": "GO",
+        "inning": "5上"
+      }
+    ]
+  },
+  "馮宗勝": {
+    "batter_pa_recent": [
+      {
+        "result": "FO",
+        "inning": "1下"
+      },
+      {
+        "result": "GO",
+        "inning": "3下"
+      },
+      {
+        "result": "K",
+        "inning": "5下"
+      },
+      {
+        "result": "BB",
+        "inning": "7下"
+      }
+    ]
+  },
+  "歐哲閎": {
+    "batter_pa_recent": [
+      {
+        "result": "GO",
+        "inning": "1下"
+      },
+      {
+        "result": "FO",
+        "inning": "3下"
+      }
+    ]
+  },
+  "林佑謙": {
+    "batter_pa_recent": [
+      {
+        "result": "1B",
+        "inning": "1下"
+      },
+      {
+        "result": "BB",
+        "inning": "3下"
+      },
+      {
+        "result": "2B",
+        "inning": "6下"
+      }
+    ]
+  },
+  "李瑋勝": {
+    "batter_pa_recent": [
+      {
+        "result": "GO",
+        "inning": "1下"
+      },
+      {
+        "result": "GO",
+        "inning": "4下"
+      },
+      {
+        "result": "1B",
+        "inning": "6下"
+      }
+    ]
+  },
+  "王逸誠": {
+    "batter_pa_recent": [
+      {
+        "result": "GO",
+        "inning": "2上"
+      },
+      {
+        "result": "E",
+        "inning": "3上"
+      },
+      {
+        "result": "FO",
+        "inning": "4上"
+      }
+    ]
+  },
+  "秦宇懷": {
+    "batter_pa_recent": [
+      {
+        "result": "GO",
+        "inning": "2上"
+      },
+      {
+        "result": "E",
+        "inning": "3上"
+      }
+    ]
+  },
+  "黃緯麟": {
+    "batter_pa_recent": [
+      {
+        "result": "1B",
+        "inning": "2上"
+      },
+      {
+        "result": "K",
+        "inning": "3上"
+      },
+      {
+        "result": "FO",
+        "inning": "5上"
+      }
+    ]
+  },
+  "陳允衡": {
+    "batter_pa_recent": [
+      {
+        "result": "BB",
+        "inning": "2上"
+      },
+      {
+        "result": "FO",
+        "inning": "3上"
+      }
+    ]
+  },
+  "鄭哲安": {
+    "batter_pa_recent": [
+      {
+        "result": "K",
+        "inning": "2下"
+      },
+      {
+        "result": "GO",
+        "inning": "4下"
+      },
+      {
+        "result": "GO",
+        "inning": "6下"
+      }
+    ]
+  },
+  "林琮宸": {
+    "batter_pa_recent": [
+      {
+        "result": "E",
+        "inning": "2下"
+      },
+      {
+        "result": "FO",
+        "inning": "4下"
+      },
+      {
+        "result": "K",
+        "inning": "6下"
+      }
+    ]
+  },
+  "宋柏霖": {
+    "batter_pa_recent": [
+      {
+        "result": "BB",
+        "inning": "2下"
+      },
+      {
+        "result": "K",
+        "inning": "5下"
+      },
+      {
+        "result": "GO",
+        "inning": "7下"
+      }
+    ]
+  },
+  "朱廣欽": {
+    "batter_pa_recent": [
+      {
+        "result": "BB",
+        "inning": "2下"
+      }
+    ]
+  },
+  "吳澤森": {
+    "batter_pa_recent": [
+      {
+        "result": "FO",
+        "inning": "2下"
+      },
+      {
+        "result": "FO",
+        "inning": "5下"
+      },
+      {
+        "result": "GO",
+        "inning": "7下"
+      }
+    ]
+  },
+  "王昱博": {
+    "batter_pa_recent": [
+      {
+        "result": "E",
+        "inning": "5上"
+      },
+      {
+        "result": "GO",
+        "inning": "6上"
+      }
+    ]
+  },
+  "陳志良": {
+    "batter_pa_recent": [
+      {
+        "result": "1B",
+        "inning": "5上"
+      }
+    ]
+  },
+  "陳揚": {
+    "batter_pa_recent": [
+      {
+        "result": "BB",
+        "inning": "5上"
+      },
+      {
+        "result": "1B",
+        "inning": "7上"
+      }
+    ]
+  },
+  "佘威縉": {
+    "batter_pa_recent": [
+      {
+        "result": "E",
+        "inning": "5下"
+      },
+      {
+        "result": "1B",
+        "inning": "7下"
+      }
+    ]
+  },
+  "黃昱翔": {
+    "batter_pa_recent": [
+      {
+        "result": "GO",
+        "inning": "6上"
+      },
+      {
+        "result": "K",
+        "inning": "7上"
+      }
+    ]
+  },
+  "許展維": {
+    "batter_pa_recent": [
+      {
+        "result": "BB",
+        "inning": "6上"
+      }
+    ]
+  },
+  "黃建昇": {
+    "batter_pa_recent": [
+      {
+        "result": "K",
+        "inning": "6上"
+      }
+    ]
+  },
+  "辜煌清": {
+    "batter_pa_recent": [
+      {
+        "result": "FO",
+        "inning": "6下"
+      },
+      {
+        "result": "GO",
+        "inning": "7下"
+      }
+    ]
+  },
+  "陳吉昌": {
+    "batter_pa_recent": [
+      {
+        "result": "FO",
+        "inning": "7上"
+      }
+    ]
+  },
+  "王易騰": {
+    "batter_pa_recent": [
+      {
+        "result": "BB",
+        "inning": "7上"
+      }
+    ]
+  },
+  "曾羽汶": {
+    "batter_pa_recent": [
+      {
+        "result": "BB",
+        "inning": "7上"
+      }
+    ]
+  },
+  "邱俊霖": {
+    "batter_pa_recent": [
+      {
+        "result": "K",
+        "inning": "7上"
+      }
+    ]
+  }
+}
